@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Regression — Interactive Masterclass</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for beautiful math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ============================================
+           ROOT & RESET
+        ============================================ */
+        :root {
+            --bg-primary: #f8f9fc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f3f9;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8888a4;
+            --accent-1: #6c63ff;
+            --accent-2: #e63976;
+            --accent-3: #0891b2;
+            --accent-4: #d97706;
+            --accent-5: #059669;
+            --gradient-1: linear-gradient(135deg, #6c63ff, #e63976);
+            --gradient-2: linear-gradient(135deg, #0891b2, #6c63ff);
+            --gradient-3: linear-gradient(135deg, #e63976, #d97706);
+            --gradient-4: linear-gradient(135deg, #059669, #0891b2);
+            --border-color: rgba(108, 99, 255, 0.12);
+            --shadow-glow: 0 4px 24px rgba(108, 99, 255, 0.08);
+            --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+            --radius-sm: 8px;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-1) var(--bg-secondary);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           SCROLLBAR
+        ============================================ */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #eef0f5; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 3px; }
+
+        /* ============================================
+           ANIMATED BACKGROUND
+        ============================================ */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(108, 99, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(108, 99, 255, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .floating-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.07;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatOrb 20s ease-in-out infinite;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: var(--accent-1); top: 10%; left: 5%; animation-delay: 0s; }
+        .orb-2 { width: 350px; height: 350px; background: var(--accent-2); top: 50%; right: 5%; animation-delay: -7s; }
+        .orb-3 { width: 300px; height: 300px; background: var(--accent-3); bottom: 10%; left: 30%; animation-delay: -14s; }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -40px) scale(1.1); }
+            50% { transform: translate(-20px, 30px) scale(0.95); }
+            75% { transform: translate(40px, 20px) scale(1.05); }
+        }
+
+        /* ============================================
+           LAYOUT
+        ============================================ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================
+           NAVIGATION
+        ============================================ */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: rgba(248, 249, 252, 0.88);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(108, 99, 255, 0.1);
+            padding: 14px 0;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        /* ============================================
+           HERO
+        ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 30px;
+            background: rgba(108, 99, 255, 0.1);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            font-size: 0.85rem;
+            color: var(--accent-1);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            background: var(--gradient-1);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(108, 99, 255, 0.45);
+        }
+
+        .hero-equation {
+            margin-top: 50px;
+            padding: 30px 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            display: inline-block;
+            box-shadow: var(--shadow-card);
+        }
+
+        .hero-equation .katex { font-size: 2rem; }
+
+        /* ============================================
+           SECTIONS
+        ============================================ */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-1);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .section-desc {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin-bottom: 50px;
+        }
+
+        /* ============================================
+           CARDS
+        ============================================ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 36px;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .card:hover {
+            border-color: rgba(108, 99, 255, 0.25);
+            box-shadow: 0 6px 30px rgba(108, 99, 255, 0.1);
+        }
+
+        .card h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p, .card li {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .card ul, .card ol {
+            padding-left: 24px;
+            margin-top: 12px;
+        }
+
+        .card li { margin-bottom: 8px; }
+
+        /* ============================================
+           EQUATION BLOCKS
+        ============================================ */
+        .eq-block {
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid rgba(108, 99, 255, 0.12);
+            border-left: 4px solid var(--accent-1);
+            border-radius: var(--radius-sm);
+            padding: 24px 28px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .eq-block .eq-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-1);
+            margin-bottom: 12px;
+        }
+
+        .eq-block .katex { font-size: 1.3rem; }
+
+        /* ============================================
+           STEP CARDS
+        ============================================ */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(108, 99, 255, 0.12);
+        }
+
+        .step-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.12;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .step-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ============================================
+           INTERACTIVE PLAYGROUND
+        ============================================ */
+        .playground {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .playground-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .playground-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .playground-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            border: 1px solid #dde0ea;
+            background: #f1f3f9;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-1);
+            background: rgba(108, 99, 255, 0.08);
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-danger {
+            background: rgba(220, 38, 38, 0.08);
+            border-color: rgba(220, 38, 38, 0.25);
+            color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 38, 38, 0.15);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 450px;
+            margin: 20px 0;
+            background: #fdfdff;
+            border-radius: var(--radius);
+            padding: 12px;
+            border: 1px solid #e2e4ed;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: #f4f5fb;
+            border-radius: var(--radius-sm);
+            padding: 16px 12px;
+            text-align: center;
+            border: 1px solid #e2e4ed;
+            transition: all 0.3s;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .stat-item:hover {
+            border-color: rgba(108, 99, 255, 0.3);
+            box-shadow: 0 2px 12px rgba(108, 99, 255, 0.08);
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(0.85rem, 2vw, 1.3rem);
+            font-weight: 700;
+            color: var(--accent-1);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+            display: block;
+        }
+
+        /* ============================================
+           GRADIENT DESCENT SECTION
+        ============================================ */
+        .gd-controls {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .gd-control-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .gd-control-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .gd-control-group input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #e2e4ed;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .gd-control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-1);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(108, 99, 255, 0.4);
+        }
+
+        .range-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-1);
+            margin-top: 6px;
+        }
+
+        .gd-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .gd-grid { grid-template-columns: 1fr; }
+        }
+
+        .gd-log {
+            background: #1e1e2e;
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.8;
+            color: #b4b4cc;
+            margin-top: 20px;
+        }
+
+        .gd-log .epoch {
+            color: #fbbf24;
+        }
+
+        .gd-log .loss-val {
+            color: #f472b6;
+        }
+
+        /* ============================================
+           ASSUMPTIONS
+        ============================================ */
+        .assumptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .assumption-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 28px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .assumption-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .assumption-card:nth-child(1)::before { background: var(--gradient-1); }
+        .assumption-card:nth-child(2)::before { background: var(--gradient-2); }
+        .assumption-card:nth-child(3)::before { background: var(--gradient-3); }
+        .assumption-card:nth-child(4)::before { background: var(--gradient-4); }
+        .assumption-card:nth-child(5)::before { background: var(--gradient-1); }
+
+        .assumption-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(108, 99, 255, 0.1);
+        }
+
+        .assumption-icon {
+            font-size: 2rem;
+            margin-bottom: 14px;
+        }
+
+        .assumption-card h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .assumption-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+           QUIZ / FAQ SECTION
+        ============================================ */
+        .quiz-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-card);
+        }
+
+        .quiz-question {
+            padding: 24px 28px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-question:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .quiz-question .q-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-1);
+            margin-right: 14px;
+            white-space: nowrap;
+        }
+
+        .quiz-question .arrow {
+            font-size: 1.2rem;
+            color: var(--accent-1);
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .quiz-item.open .quiz-question .arrow {
+            transform: rotate(180deg);
+        }
+
+        .quiz-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .quiz-answer-inner {
+            padding: 0 28px 24px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .quiz-answer-inner .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-google { background: rgba(8, 145, 178, 0.1); color: #0e7490; }
+        .tag-meta { background: rgba(108, 99, 255, 0.1); color: #5b52e0; }
+        .tag-amazon { background: rgba(217, 119, 6, 0.1); color: #b45309; }
+        .tag-netflix { background: rgba(230, 57, 118, 0.1); color: #be185d; }
+        .tag-apple { background: rgba(5, 150, 105, 0.1); color: #047857; }
+        .tag-edge { background: rgba(230, 57, 118, 0.08); color: #be185d; border: 1px solid rgba(230,57,118,0.2);}
+
+        /* ============================================
+           CODE BLOCKS
+        ============================================ */
+        .code-block {
+            background: #0d0d14;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            margin: 16px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.9;
+            overflow-x: auto;
+            color: var(--text-secondary);
+        }
+
+        .code-block .keyword { color: var(--accent-1); }
+        .code-block .func { color: var(--accent-3); }
+        .code-block .string { color: var(--accent-5); }
+        .code-block .comment { color: var(--text-muted); font-style: italic; }
+        .code-block .number { color: var(--accent-2); }
+
+        /* ============================================
+           HIGHLIGHT BOXES
+        ============================================ */
+        .highlight-box {
+            background: rgba(108, 99, 255, 0.06);
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            margin: 16px 0;
+        }
+
+        .highlight-box.warn {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+
+        .highlight-box.success {
+            background: rgba(0, 230, 118, 0.05);
+            border-color: rgba(0, 230, 118, 0.15);
+        }
+
+        /* ============================================
+           TABLE OF CONTENTS PROGRESS
+        ============================================ */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            z-index: 1001;
+            transition: width 0.1s;
+        }
+
+        /* ============================================
+           FOOTER
+        ============================================ */
+        footer {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer .heart { color: var(--accent-2); }
+
+        /* ============================================
+           RESPONSIVE
+        ============================================ */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .playground { padding: 24px; }
+            .card { padding: 24px; }
+            .hero-equation { padding: 20px; }
+            .hero-equation .katex { font-size: 1.3rem; }
+            .gd-controls { gap: 14px; }
+        }
+
+        /* ============================================
+           ANIMATIONS
+        ============================================ */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            border-bottom: 1px dashed var(--accent-1);
+            cursor: help;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1e2e;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .click-instruction {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Background Effects -->
+<div class="bg-grid"></div>
+<div class="floating-orb orb-1"></div>
+<div class="floating-orb orb-2"></div>
+<div class="floating-orb orb-3"></div>
+
+<!-- Reading Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ============================================
+     NAVIGATION
+============================================ -->
+<nav>
+    <div class="container">
+        <div class="nav-logo">📐 LinReg Lab</div>
+        <div class="nav-links">
+            <a href="#intuition">Intuition</a>
+            <a href="#math">Mathematics</a>
+            <a href="#playground">Playground</a>
+            <a href="#gradient-descent">Gradient Descent</a>
+            <a href="#assumptions">Assumptions</a>
+            <a href="#metrics">Metrics</a>
+            <a href="#interview">Interview Q&A</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================================
+     HERO SECTION
+============================================ -->
+<section class="hero" id="hero">
+    <div class="container">
+        <div class="hero-badge">🚀 Interactive Masterclass</div>
+        <h1>
+            Master<br>
+            <span class="gradient-text">Linear Regression</span>
+        </h1>
+        <p>
+            From intuition to implementation. Visualize every concept, interact with real data,
+            and ace your next machine learning interview — all in one page.
+        </p>
+        <a href="#intuition" class="hero-cta">
+            Begin Learning ↓
+        </a>
+        <div class="hero-equation" id="heroEq">
+            <!-- Rendered by KaTeX -->
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 1 — INTUITION
+============================================ -->
+<section id="intuition">
+    <div class="container">
+        <div class="section-label fade-in">📖 Chapter 01</div>
+        <h2 class="section-title fade-in">What is Linear Regression?</h2>
+        <p class="section-desc fade-in">
+            The simplest yet most powerful supervised learning algorithm — the foundation of every data scientist's toolkit.
+        </p>
+
+        <div class="card fade-in">
+            <h3>🎯 The Core Idea</h3>
+            <p>
+                Imagine you have data about houses — their <strong>size (in sq ft)</strong> and their <strong>price</strong>.
+                You notice a pattern: <em>bigger houses tend to cost more</em>. Linear regression finds the <strong>best straight line</strong>
+                through these data points so you can <strong>predict</strong> the price of a new house given its size.
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">The Model</div>
+                <div id="eq-model"></div>
+            </div>
+
+            <p style="margin-top: 16px;">
+                Where:
+            </p>
+            <ul>
+                <li><strong>\(\hat{y}\)</strong> — Predicted value (e.g., house price)</li>
+                <li><strong>\(w\)</strong> — Weight (slope) — how much \(y\) changes when \(x\) increases by 1</li>
+                <li><strong>\(b\)</strong> — Bias (intercept) — the value of \(y\) when \(x = 0\)</li>
+                <li><strong>\(x\)</strong> — Input feature (e.g., house size)</li>
+            </ul>
+        </div>
+
+        <div class="steps-grid fade-in">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <h4>📊 Collect Data</h4>
+                <p>Gather input-output pairs: features (X) and target values (y). More quality data = better model.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <h4>📏 Fit the Line</h4>
+                <p>Find parameters \(w\) and \(b\) that make the line pass as close as possible to all data points.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <h4>🎯 Predict</h4>
+                <p>Use the fitted line to predict \(\hat{y}\) for new, unseen values of \(x\). That's inference!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 2 — THE MATHEMATICS
+============================================ -->
+<section id="math">
+    <div class="container">
+        <div class="section-label fade-in">📐 Chapter 02</div>
+        <h2 class="section-title fade-in">The Mathematics Behind the Magic</h2>
+        <p class="section-desc fade-in">
+            Every elegant prediction starts with rigorous math. Let's derive everything from first principles.
+        </p>
+
+        <!-- Cost Function -->
+        <div class="card fade-in">
+            <h3>💰 The Cost Function (MSE)</h3>
+            <p>
+                How do we know if our line is "good"? We measure the <strong>error</strong> — the difference between
+                predicted values \(\hat{y}_i\) and actual values \(y_i\). We square these errors (to penalize large ones)
+                and average them.
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Mean Squared Error (MSE)</div>
+                <div id="eq-mse"></div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 16px;">
+                <strong>🤔 Why square the errors?</strong><br>
+                <ul style="margin-top: 8px;">
+                    <li>Makes all errors positive (no cancellation of +/− errors)</li>
+                    <li>Penalizes large errors more than small ones (quadratic penalty)</li>
+                    <li>Makes the function differentiable everywhere — crucial for optimization</li>
+                    <li>Results in a convex function with a single global minimum ✅</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Ordinary Least Squares -->
+        <div class="card fade-in">
+            <h3>📏 Closed-Form Solution (OLS)</h3>
+            <p>
+                For simple linear regression, we can find the <strong>exact optimal</strong> parameters analytically using
+                <strong>Ordinary Least Squares (OLS)</strong>. Set the partial derivatives to zero and solve:
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Optimal Weight (Slope)</div>
+                <div id="eq-ols-w"></div>
+            </div>
+
+            <div class="eq-block">
+                <div class="eq-label">Optimal Bias (Intercept)</div>
+                <div id="eq-ols-b"></div>
+            </div>
+
+            <div class="highlight-box success" style="margin-top: 16px;">
+                <strong>✅ Theorem: </strong> For a dataset with \(n\) points, the OLS estimators \(\hat{w}\) and \(\hat{b}\) are
+                the <strong>Best Linear Unbiased Estimators (BLUE)</strong> under the Gauss-Markov assumptions.
+                This is the celebrated <strong>Gauss-Markov Theorem</strong>.
+            </div>
+        </div>
+
+        <!-- Matrix Form -->
+        <div class="card fade-in">
+            <h3>🧮 Matrix Formulation (Multiple Regression)</h3>
+            <p>
+                When we have multiple features, we use matrix notation. The model becomes:
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Vectorized Model</div>
+                <div id="eq-matrix-model"></div>
+            </div>
+
+            <div class="eq-block">
+                <div class="eq-label">Normal Equation — Closed-form Solution</div>
+                <div id="eq-normal"></div>
+            </div>
+
+            <div class="highlight-box warn" style="margin-top: 16px;">
+                <strong>⚠️ Caution:</strong> The Normal Equation requires computing \((X^TX)^{-1}\), which has
+                time complexity \(O(n \cdot d^2 + d^3)\). For large \(d\) (many features), this becomes expensive.
+                That's when <strong>Gradient Descent</strong> becomes essential.
+            </div>
+        </div>
+
+        <!-- R-squared derivation -->
+        <div class="card fade-in">
+            <h3>📊 Decomposition of Variance</h3>
+            <p>
+                A beautiful identity in statistics: the total variation in \(y\) can be decomposed into explained + unexplained parts.
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Sum of Squares Decomposition</div>
+                <div id="eq-ss"></div>
+            </div>
+
+            <div class="eq-block">
+                <div class="eq-label">Where</div>
+                <div id="eq-ss-detail"></div>
+            </div>
+
+            <div class="eq-block">
+                <div class="eq-label">Coefficient of Determination</div>
+                <div id="eq-r2"></div>
+            </div>
+
+            <div class="highlight-box">
+                <strong>💡 Interpretation of R²:</strong> The proportion of variance in the dependent variable
+                that is predictable from the independent variable(s). Ranges from 0 to 1 (higher = better fit).
+                An R² of 0.85 means 85% of the variance is explained by the model.
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 3 — INTERACTIVE PLAYGROUND
+============================================ -->
+<section id="playground">
+    <div class="container">
+        <div class="section-label fade-in">🎮 Chapter 03</div>
+        <h2 class="section-title fade-in">Interactive Playground</h2>
+        <p class="section-desc fade-in">
+            Click on the canvas to add data points. Watch the regression line update in real-time.
+            <strong>Learn by doing!</strong>
+        </p>
+
+        <div class="playground fade-in">
+            <div class="playground-header">
+                <h3>🖱️ Click to Add Points</h3>
+                <div class="playground-controls">
+                    <button class="btn" onclick="generateSampleData('linear')">📈 Linear Data</button>
+                    <button class="btn" onclick="generateSampleData('noisy')">🌊 Noisy Data</button>
+                    <button class="btn" onclick="generateSampleData('quadratic')">🔄 Non-Linear</button>
+                    <button class="btn btn-danger" onclick="clearPlayground()">🗑️ Clear</button>
+                </div>
+            </div>
+
+            <p class="click-instruction">💡 Click anywhere on the chart below to add data points, or use the preset buttons above.</p>
+
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 10px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">
+                    <input type="checkbox" id="showResiduals" checked onchange="toggleResiduals()" style="accent-color: var(--accent-1);">
+                    Show Residuals
+                </label>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">
+                    <span style="display:inline-block;width:12px;height:3px;background:rgba(22,163,74,0.7);margin-right:4px;vertical-align:middle;"></span>
+                    Above line
+                    &nbsp;&nbsp;
+                    <span style="display:inline-block;width:12px;height:3px;background:rgba(220,38,38,0.7);margin-right:4px;vertical-align:middle;"></span>
+                    Below line
+                </span>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="playgroundChart"></canvas>
+            </div>
+
+            <div class="stats-row" id="playgroundStats">
+                <div class="stat-item">
+                    <div class="stat-label">Points</div>
+                    <div class="stat-value" id="statN">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Slope (w)</div>
+                    <div class="stat-value" id="statW">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Intercept (b)</div>
+                    <div class="stat-value" id="statB">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">R² Score</div>
+                    <div class="stat-value" id="statR2">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">MSE</div>
+                    <div class="stat-value" id="statMSE">—</div>
+                </div>
+            </div>
+
+            <div class="eq-block" style="margin-top: 24px;">
+                <div class="eq-label">Current Fitted Equation</div>
+                <div id="fittedEquation" style="font-size: 1.1rem; color: var(--accent-3); font-family: 'JetBrains Mono', monospace;">
+                    ŷ = ? · x + ?
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 4 — GRADIENT DESCENT
+============================================ -->
+<section id="gradient-descent">
+    <div class="container">
+        <div class="section-label fade-in">⚡ Chapter 04</div>
+        <h2 class="section-title fade-in">Gradient Descent — Step by Step</h2>
+        <p class="section-desc fade-in">
+            The workhorse optimization algorithm of machine learning. Watch it converge in real-time!
+        </p>
+
+        <div class="card fade-in">
+            <h3>🧠 The Algorithm</h3>
+            <p>
+                Gradient Descent iteratively adjusts \(w\) and \(b\) in the direction that <strong>reduces the cost function</strong>.
+                Think of it as rolling a ball downhill on the MSE surface until it reaches the lowest point.
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Gradient of MSE w.r.t. w</div>
+                <div id="eq-grad-w"></div>
+            </div>
+
+            <div class="eq-block">
+                <div class="eq-label">Gradient of MSE w.r.t. b</div>
+                <div id="eq-grad-b"></div>
+            </div>
+
+            <div class="eq-block">
+                <div class="eq-label">Update Rules</div>
+                <div id="eq-update"></div>
+            </div>
+
+            <p style="margin-top: 14px;">
+                Where \(\alpha\) is the <strong>learning rate</strong> — it controls the step size. Too large → overshoots. Too small → slow convergence.
+            </p>
+        </div>
+
+        <!-- GD Interactive -->
+        <div class="playground fade-in" style="margin-top: 30px;">
+            <div class="playground-header">
+                <h3>🎛️ Gradient Descent Simulator</h3>
+                <div class="playground-controls">
+                    <button class="btn btn-primary" id="gdStartBtn" onclick="startGD()">▶️ Start</button>
+                    <button class="btn" id="gdPauseBtn" onclick="pauseGD()" style="display:none;">⏸️ Pause</button>
+                    <button class="btn" onclick="stepGD()">⏭️ Step</button>
+                    <button class="btn btn-danger" onclick="resetGD()">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="gd-controls">
+                <div class="gd-control-group">
+                    <label>Learning Rate (α)</label>
+                    <input type="range" id="lrSlider" min="0.0001" max="0.05" step="0.0001" value="0.001"
+                           oninput="document.getElementById('lrVal').textContent = parseFloat(this.value).toFixed(4)">
+                    <div class="range-value" id="lrVal">0.0010</div>
+                </div>
+                <div class="gd-control-group">
+                    <label>Max Epochs</label>
+                    <input type="range" id="epochSlider" min="10" max="500" step="10" value="100"
+                           oninput="document.getElementById('epochVal').textContent = this.value">
+                    <div class="range-value" id="epochVal">100</div>
+                </div>
+                <div class="gd-control-group">
+                    <label>Animation Speed</label>
+                    <input type="range" id="speedSlider" min="1" max="5" step="1" value="3"
+                           oninput="updateSpeedLabel()">
+                    <div class="range-value" id="speedVal">⚡ Medium</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+                <div class="highlight-box" style="flex:1; min-width: 200px; margin:0; padding: 12px 16px; font-size: 0.82rem;">
+                    <strong>💡 Tip:</strong> Start with α = 0.001. If loss decreases slowly, increase it. If loss explodes, decrease it!
+                </div>
+                <div class="highlight-box warn" style="flex:1; min-width: 200px; margin:0; padding: 12px 16px; font-size: 0.82rem;" id="gdStatusBox">
+                    <strong>📊 Status:</strong> <span id="gdStatusText">Ready — press Start or Step</span>
+                </div>
+            </div>
+
+            <div class="gd-grid">
+                <div class="chart-container" style="height: 350px;">
+                    <canvas id="gdFitChart"></canvas>
+                </div>
+                <div class="chart-container" style="height: 350px;">
+                    <canvas id="gdLossChart"></canvas>
+                </div>
+            </div>
+
+            <div class="stats-row" style="margin-top: 16px;">
+                <div class="stat-item">
+                    <div class="stat-label">Epoch</div>
+                    <div class="stat-value" id="gdEpoch">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Weight (w)</div>
+                    <div class="stat-value" id="gdW">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Bias (b)</div>
+                    <div class="stat-value" id="gdB">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Loss (MSE)</div>
+                    <div class="stat-value" id="gdLoss">—</div>
+                </div>
+            </div>
+
+            <div class="gd-log" id="gdLog">
+                <div style="color: #777;">// Gradient Descent log will appear here...</div>
+            </div>
+        </div>
+
+        <!-- GD Variants -->
+        <div class="card fade-in" style="margin-top: 30px;">
+            <h3>📚 Gradient Descent Variants</h3>
+            <div class="steps-grid" style="margin-top: 20px;">
+                <div class="step-card">
+                    <div class="step-number">B</div>
+                    <h4>Batch GD</h4>
+                    <p>Uses <strong>all</strong> data points in each update. Stable but slow for large datasets. Guaranteed convergence for convex functions.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">S</div>
+                    <h4>Stochastic GD</h4>
+                    <p>Uses <strong>one random</strong> data point per update. Noisy but fast. Can escape local minima in non-convex settings.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">M</div>
+                    <h4>Mini-Batch GD</h4>
+                    <p>Uses a <strong>small batch</strong> (e.g., 32 or 64 points). Best of both worlds — the industry standard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 5 — ASSUMPTIONS
+============================================ -->
+<section id="assumptions">
+    <div class="container">
+        <div class="section-label fade-in">📋 Chapter 05</div>
+        <h2 class="section-title fade-in">The 5 Key Assumptions</h2>
+        <p class="section-desc fade-in">
+            Linear regression works beautifully — <em>when its assumptions hold</em>. Violating them leads to unreliable predictions.
+        </p>
+
+        <div class="assumptions-grid fade-in">
+            <div class="assumption-card">
+                <div class="assumption-icon">📏</div>
+                <h4>1. Linearity</h4>
+                <p>The relationship between X and Y must be linear. Use residual plots to check. If violated → consider polynomial features or transformations.</p>
+            </div>
+            <div class="assumption-card">
+                <div class="assumption-icon">🎯</div>
+                <h4>2. Independence</h4>
+                <p>Observations must be independent of each other. Common violation: time-series data where consecutive points are correlated (autocorrelation).</p>
+            </div>
+            <div class="assumption-card">
+                <div class="assumption-icon">📊</div>
+                <h4>3. Homoscedasticity</h4>
+                <p>Residuals should have constant variance across all levels of X. If variance changes (heteroscedasticity) → use Weighted Least Squares or log transform.</p>
+            </div>
+            <div class="assumption-card">
+                <div class="assumption-icon">🔔</div>
+                <h4>4. Normality of Errors</h4>
+                <p>Residuals should be approximately normally distributed. Important for hypothesis testing & confidence intervals. Check with Q-Q plots.</p>
+            </div>
+            <div class="assumption-card">
+                <div class="assumption-icon">🔗</div>
+                <h4>5. No Multicollinearity</h4>
+                <p>(For multiple regression) Features should not be highly correlated with each other. Check using VIF (Variance Inflation Factor). VIF > 10 → problem!</p>
+            </div>
+        </div>
+
+        <div class="card fade-in" style="margin-top: 30px;">
+            <h3>📐 Gauss-Markov Theorem</h3>
+            <p>
+                Under assumptions 1–3 (linearity, independence, homoscedasticity), plus the error having zero mean:
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Gauss-Markov Conditions</div>
+                <div id="eq-gm"></div>
+            </div>
+
+            <p style="margin-top: 14px;">
+                Then the OLS estimators are <strong>BLUE</strong> — Best Linear Unbiased Estimators.
+                <em>"Best"</em> means minimum variance among all linear unbiased estimators.
+                This is why OLS is so widely used — it's provably optimal under these conditions!
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 6 — EVALUATION METRICS
+============================================ -->
+<section id="metrics">
+    <div class="container">
+        <div class="section-label fade-in">📊 Chapter 06</div>
+        <h2 class="section-title fade-in">Evaluation Metrics</h2>
+        <p class="section-desc fade-in">
+            How do we know if our model is good? Here are the key metrics every data scientist must know.
+        </p>
+
+        <div class="steps-grid fade-in">
+            <div class="step-card">
+                <div class="step-number">MSE</div>
+                <h4>Mean Squared Error</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-metric-mse"></div>
+                </div>
+                <p style="margin-top: 8px;">Penalizes large errors quadratically. Most common loss function. Units are squared.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">RMSE</div>
+                <h4>Root Mean Squared Error</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-metric-rmse"></div>
+                </div>
+                <p style="margin-top: 8px;">Same units as Y. More interpretable. Standard metric in Kaggle competitions.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">MAE</div>
+                <h4>Mean Absolute Error</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-metric-mae"></div>
+                </div>
+                <p style="margin-top: 8px;">Robust to outliers. Doesn't penalize large errors as much. Not differentiable at 0.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">R²</div>
+                <h4>R-Squared</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-metric-r2"></div>
+                </div>
+                <p style="margin-top: 8px;">0 to 1 scale. 1 = perfect. Can be negative for terrible models. Use Adjusted R² for multiple features.</p>
+            </div>
+        </div>
+
+        <div class="card fade-in" style="margin-top: 30px;">
+            <h3>⚖️ Adjusted R² — The Fairer Metric</h3>
+            <p>
+                R² always increases (or stays the same) when adding more features — even irrelevant ones!
+                Adjusted R² penalizes unnecessary complexity:
+            </p>
+
+            <div class="eq-block">
+                <div class="eq-label">Adjusted R²</div>
+                <div id="eq-adj-r2"></div>
+            </div>
+
+            <p style="margin-top: 12px;">
+                Where \(n\) = number of samples and \(p\) = number of predictors. Adjusted R² will <strong>decrease</strong>
+                if a new feature doesn't improve the model enough to justify the added complexity.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 7 — REGULARIZATION
+============================================ -->
+<section id="regularization">
+    <div class="container">
+        <div class="section-label fade-in">🛡️ Chapter 07</div>
+        <h2 class="section-title fade-in">Regularization — Taming Overfitting</h2>
+        <p class="section-desc fade-in">
+            When your model is too complex, it memorizes noise. Regularization adds a penalty to keep weights small.
+        </p>
+
+        <div class="steps-grid fade-in">
+            <div class="step-card">
+                <div class="step-number">L2</div>
+                <h4>Ridge Regression</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-ridge"></div>
+                </div>
+                <p style="margin-top: 8px;">Adds L2 penalty. Shrinks weights toward zero but never exactly zero. Good when all features are relevant.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">L1</div>
+                <h4>Lasso Regression</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-lasso"></div>
+                </div>
+                <p style="margin-top: 8px;">Adds L1 penalty. Can shrink weights to exactly zero → automatic feature selection! Sparse solutions.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">L1+L2</div>
+                <h4>Elastic Net</h4>
+                <div class="eq-block" style="margin-top: 10px;">
+                    <div id="eq-elasticnet"></div>
+                </div>
+                <p style="margin-top: 8px;">Combines L1 + L2 penalties. Best of both worlds. Use when features are correlated and you want sparsity.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SECTION 8 — INTERVIEW Q&A
+============================================ -->
+<section id="interview">
+    <div class="container">
+        <div class="section-label fade-in">🏢 Chapter 08</div>
+        <h2 class="section-title fade-in">Top Tech Interview Questions</h2>
+        <p class="section-desc fade-in">
+            Real questions asked at Google, Meta, Amazon, Netflix & Apple. Click to reveal the answer.
+        </p>
+
+        <div id="quizContainer" class="fade-in">
+            <!-- Generated by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     FOOTER
+============================================ -->
+<footer>
+    <div class="container">
+        <p>
+            Built with <span class="heart">♥</span> for learners everywhere • Linear Regression Interactive Masterclass
+        </p>
+        <p style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">
+            All equations rendered with KaTeX • Charts powered by Chart.js
+        </p>
+    </div>
+</footer>
+
+<!-- ============================================
+     JAVASCRIPT
+============================================ -->
+<script>
+// ============================================
+// RENDER ALL MATH EQUATIONS
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+
+    const equations = {
+        // Hero
+        'heroEq': '\\hat{y} = w \\cdot x + b',
+
+        // Model
+        'eq-model': '\\hat{y} = w \\cdot x + b',
+
+        // MSE
+        'eq-mse': 'J(w, b) = \\text{MSE} = \\dfrac{1}{n} \\sum_{i=1}^{n} \\left( y_i - \\hat{y}_i \\right)^2 = \\dfrac{1}{n} \\sum_{i=1}^{n} \\left( y_i - (wx_i + b) \\right)^2',
+
+        // OLS
+        'eq-ols-w': '\\hat{w} = \\dfrac{\\sum_{i=1}^{n}(x_i - \\bar{x})(y_i - \\bar{y})}{\\sum_{i=1}^{n}(x_i - \\bar{x})^2} = \\dfrac{\\text{Cov}(X, Y)}{\\text{Var}(X)}',
+        'eq-ols-b': '\\hat{b} = \\bar{y} - \\hat{w} \\cdot \\bar{x}',
+
+        // Matrix
+        'eq-matrix-model': '\\hat{\\mathbf{y}} = \\mathbf{X} \\boldsymbol{\\beta} \\quad \\text{where} \\quad \\boldsymbol{\\beta} = \\begin{bmatrix} b \\\\ w_1 \\\\ w_2 \\\\ \\vdots \\\\ w_d \\end{bmatrix}',
+        'eq-normal': '\\boldsymbol{\\hat{\\beta}} = (\\mathbf{X}^T \\mathbf{X})^{-1} \\mathbf{X}^T \\mathbf{y}',
+
+        // SS decomposition
+        'eq-ss': '\\underbrace{\\sum(y_i - \\bar{y})^2}_{\\text{SST}} = \\underbrace{\\sum(\\hat{y}_i - \\bar{y})^2}_{\\text{SSR}} + \\underbrace{\\sum(y_i - \\hat{y}_i)^2}_{\\text{SSE}}',
+        'eq-ss-detail': '\\text{SST (Total)} = \\text{SSR (Regression)} + \\text{SSE (Error)}',
+        'eq-r2': 'R^2 = 1 - \\dfrac{\\text{SSE}}{\\text{SST}} = \\dfrac{\\text{SSR}}{\\text{SST}}',
+
+        // Gradient Descent
+        'eq-grad-w': '\\dfrac{\\partial J}{\\partial w} = -\\dfrac{2}{n} \\sum_{i=1}^{n} x_i \\left( y_i - (wx_i + b) \\right)',
+        'eq-grad-b': '\\dfrac{\\partial J}{\\partial b} = -\\dfrac{2}{n} \\sum_{i=1}^{n} \\left( y_i - (wx_i + b) \\right)',
+        'eq-update': 'w := w - \\alpha \\cdot \\dfrac{\\partial J}{\\partial w} \\qquad b := b - \\alpha \\cdot \\dfrac{\\partial J}{\\partial b}',
+
+        // Gauss-Markov
+        'eq-gm': 'E[\\varepsilon_i] = 0, \\quad \\text{Var}(\\varepsilon_i) = \\sigma^2, \\quad \\text{Cov}(\\varepsilon_i, \\varepsilon_j) = 0 \\; (i \\neq j)',
+
+        // Metrics
+        'eq-metric-mse': '\\text{MSE} = \\frac{1}{n}\\sum(y_i - \\hat{y}_i)^2',
+        'eq-metric-rmse': '\\text{RMSE} = \\sqrt{\\frac{1}{n}\\sum(y_i - \\hat{y}_i)^2}',
+        'eq-metric-mae': '\\text{MAE} = \\frac{1}{n}\\sum|y_i - \\hat{y}_i|',
+        'eq-metric-r2': 'R^2 = 1 - \\frac{\\text{SS}_{\\text{res}}}{\\text{SS}_{\\text{tot}}}',
+
+        // Adjusted R²
+        'eq-adj-r2': 'R^2_{adj} = 1 - \\dfrac{(1 - R^2)(n - 1)}{n - p - 1}',
+
+        // Regularization
+        'eq-ridge': 'J_{\\text{Ridge}} = \\text{MSE} + \\lambda \\sum_{j=1}^{d} w_j^2',
+        'eq-lasso': 'J_{\\text{Lasso}} = \\text{MSE} + \\lambda \\sum_{j=1}^{d} |w_j|',
+        'eq-elasticnet': 'J_{\\text{EN}} = \\text{MSE} + \\lambda_1 \\sum|w_j| + \\lambda_2 \\sum w_j^2',
+    };
+
+    for (const [id, tex] of Object.entries(equations)) {
+        const el = document.getElementById(id);
+        if (el) {
+            katex.render(tex, el, { displayMode: true, throwOnError: false });
+        }
+    }
+
+    // Render inline math
+    renderMathInElement(document.body, {
+        delimiters: [
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true },
+        ],
+        throwOnError: false
+    });
+
+    // Initialize everything
+    initPlayground();
+    initGradientDescent();
+    generateQuiz();
+    initScrollAnimations();
+    initProgressBar();
+});
+
+// ============================================
+// SCROLL ANIMATIONS
+// ============================================
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+}
+
+// ============================================
+// PROGRESS BAR
+// ============================================
+function initProgressBar() {
+    const bar = document.getElementById('progressBar');
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (scrollTop / docHeight * 100) + '%';
+    });
+}
+
+// ============================================
+// CHART.JS PLUGIN — Residual Lines
+// ============================================
+const residualPlugin = {
+    id: 'residualLines',
+    afterDatasetsDraw(chart) {
+        if (!chart.residualData) return;
+        const ctx = chart.ctx;
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.y;
+
+        chart.residualData.forEach(r => {
+            const xPx = xScale.getPixelForValue(r.x);
+            const yActPx = yScale.getPixelForValue(r.yActual);
+            const yPredPx = yScale.getPixelForValue(r.yPred);
+
+            const isPositive = r.yActual >= r.yPred;
+            ctx.save();
+            ctx.strokeStyle = isPositive ? 'rgba(22, 163, 74, 0.55)' : 'rgba(220, 38, 38, 0.55)';
+            ctx.lineWidth = 1.8;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(xPx, yActPx);
+            ctx.lineTo(xPx, yPredPx);
+            ctx.stroke();
+            ctx.restore();
+        });
+    }
+};
+Chart.register(residualPlugin);
+
+// ============================================
+// PLAYGROUND — Interactive Scatter Plot
+// ============================================
+let playgroundChart;
+let dataPoints = [];
+
+function initPlayground() {
+    const ctx = document.getElementById('playgroundChart').getContext('2d');
+
+    playgroundChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Data Points',
+                    data: [],
+                    backgroundColor: 'rgba(67, 56, 202, 0.85)',
+                    borderColor: 'rgba(49, 46, 129, 1)',
+                    borderWidth: 2.5,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointStyle: 'circle',
+                    pointHoverBackgroundColor: '#ff6b9d',
+                    pointHoverBorderColor: '#be185d',
+                    pointHoverBorderWidth: 3,
+                },
+                {
+                    label: 'Regression Line',
+                    data: [],
+                    type: 'line',
+                    borderColor: 'rgba(220, 38, 38, 0.95)',
+                    borderWidth: 3.5,
+                    pointRadius: 0,
+                    fill: false,
+                    borderDash: [],
+                },
+                {
+                    label: 'Residuals',
+                    data: [],
+                    type: 'line',
+                    borderColor: 'rgba(234, 88, 12, 0.4)',
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: false,
+                    borderDash: [4, 4],
+                    showLine: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 300 },
+            plugins: {
+                legend: {
+                    labels: { color: '#334155', font: { family: 'Inter', size: 12, weight: 500 } }
+                }
+            },
+            scales: {
+                x: {
+                    min: 0, max: 100,
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 11 } },
+                    title: { display: true, text: 'Feature (X)', color: '#334155', font: { family: 'Inter', size: 13, weight: 600 } },
+                    border: { color: '#cbd5e1' }
+                },
+                y: {
+                    min: 0, max: 100,
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 11 } },
+                    title: { display: true, text: 'Target (Y)', color: '#334155', font: { family: 'Inter', size: 13, weight: 600 } },
+                    border: { color: '#cbd5e1' }
+                }
+            },
+            onClick: (event) => {
+                const rect = playgroundChart.canvas.getBoundingClientRect();
+                const xScale = playgroundChart.scales.x;
+                const yScale = playgroundChart.scales.y;
+
+                const canvasX = event.native.clientX - rect.left;
+                const canvasY = event.native.clientY - rect.top;
+
+                const xVal = xScale.getValueForPixel(canvasX);
+                const yVal = yScale.getValueForPixel(canvasY);
+
+                if (xVal >= 0 && xVal <= 100 && yVal >= 0 && yVal <= 100) {
+                    addPoint(xVal, yVal);
+                }
+            }
+        }
+    });
+}
+
+function addPoint(x, y) {
+    dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
+    updatePlayground();
+}
+
+function updatePlayground() {
+    playgroundChart.data.datasets[0].data = [...dataPoints];
+
+    if (dataPoints.length >= 2) {
+        const { w, b, r2, mse } = computeOLS(dataPoints);
+
+        // Draw regression line
+        const xMin = 0, xMax = 100;
+        playgroundChart.data.datasets[1].data = [
+            { x: xMin, y: w * xMin + b },
+            { x: xMax, y: w * xMax + b }
+        ];
+
+        // Draw residual lines (vertical dashes from each point to the line)
+        // We use a custom plugin for this
+        const showRes = document.getElementById('showResiduals') && document.getElementById('showResiduals').checked;
+        playgroundChart.residualData = showRes ? dataPoints.map(p => ({
+            x: p.x,
+            yActual: p.y,
+            yPred: w * p.x + b
+        })) : null;
+
+        // Update stats
+        document.getElementById('statW').textContent = w.toFixed(4);
+        document.getElementById('statB').textContent = b.toFixed(4);
+        document.getElementById('statR2').textContent = r2.toFixed(4);
+        document.getElementById('statMSE').textContent = mse.toFixed(4);
+        document.getElementById('fittedEquation').textContent = `ŷ = ${w.toFixed(4)} · x + ${b.toFixed(4)}`;
+    } else {
+        playgroundChart.data.datasets[1].data = [];
+        playgroundChart.residualData = null;
+        document.getElementById('statW').textContent = '—';
+        document.getElementById('statB').textContent = '—';
+        document.getElementById('statR2').textContent = '—';
+        document.getElementById('statMSE').textContent = '—';
+        document.getElementById('fittedEquation').textContent = 'ŷ = ? · x + ?';
+    }
+
+    document.getElementById('statN').textContent = dataPoints.length;
+    playgroundChart.update();
+}
+
+function computeOLS(points) {
+    const n = points.length;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+
+    for (const p of points) {
+        sx += p.x;
+        sy += p.y;
+        sxx += p.x * p.x;
+        sxy += p.x * p.y;
+    }
+
+    const xMean = sx / n;
+    const yMean = sy / n;
+
+    const w = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    const b = yMean - w * xMean;
+
+    // Compute R² and MSE
+    let ssRes = 0, ssTot = 0;
+    for (const p of points) {
+        const yHat = w * p.x + b;
+        ssRes += (p.y - yHat) ** 2;
+        ssTot += (p.y - yMean) ** 2;
+    }
+
+    const mse = ssRes / n;
+    const r2 = ssTot === 0 ? 1 : 1 - ssRes / ssTot;
+
+    return { w, b, r2, mse };
+}
+
+function generateSampleData(type) {
+    dataPoints = [];
+
+    if (type === 'linear') {
+        for (let i = 0; i < 30; i++) {
+            const x = Math.random() * 80 + 10;
+            const y = 0.7 * x + 10 + (Math.random() - 0.5) * 12;
+            dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.max(0, Math.min(100, Math.round(y * 10) / 10)) });
+        }
+    } else if (type === 'noisy') {
+        for (let i = 0; i < 40; i++) {
+            const x = Math.random() * 80 + 10;
+            const y = 0.5 * x + 20 + (Math.random() - 0.5) * 40;
+            dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.max(0, Math.min(100, Math.round(y * 10) / 10)) });
+        }
+    } else if (type === 'quadratic') {
+        for (let i = 0; i < 35; i++) {
+            const x = Math.random() * 80 + 10;
+            const y = 0.015 * (x - 50) ** 2 + 20 + (Math.random() - 0.5) * 10;
+            dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.max(0, Math.min(100, Math.round(y * 10) / 10)) });
+        }
+    }
+
+    updatePlayground();
+}
+
+function clearPlayground() {
+    dataPoints = [];
+    updatePlayground();
+}
+
+function toggleResiduals() {
+    const show = document.getElementById('showResiduals').checked;
+    if (!show) {
+        playgroundChart.residualData = null;
+    }
+    updatePlayground();
+}
+
+// Override to respect toggle
+const _origUpdatePlayground = updatePlayground;
+// (residual toggle is handled within updatePlayground via the checkbox check)
+
+// ============================================
+// GRADIENT DESCENT SIMULATOR
+// ============================================
+let gdFitChart, gdLossChart;
+let gdData = [];         // original data
+let gdDataNorm = [];     // normalized data for GD
+let gdW = 0, gdBias = 0; // params in normalized space
+let gdAnimId = null;
+let gdTimeoutId = null;
+let gdEpochCount = 0;
+let gdLossHistory = [];
+let gdPaused = false;
+
+// Normalization stats
+let gdXMean = 0, gdXStd = 1, gdYMean = 0, gdYStd = 1;
+
+function getSpeedDelay() {
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    // 1=Very Slow(500ms), 2=Slow(200ms), 3=Medium(80ms), 4=Fast(20ms), 5=Instant(0ms)
+    const delays = { 1: 500, 2: 200, 3: 80, 4: 20, 5: 0 };
+    return delays[speed] || 80;
+}
+
+function updateSpeedLabel() {
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    const labels = { 1: '🐢 Very Slow', 2: '🚶 Slow', 3: '⚡ Medium', 4: '🏃 Fast', 5: '🚀 Instant' };
+    document.getElementById('speedVal').textContent = labels[speed];
+}
+
+function normalizeData(data) {
+    const xs = data.map(p => p.x);
+    const ys = data.map(p => p.y);
+
+    gdXMean = xs.reduce((a, b) => a + b, 0) / xs.length;
+    gdYMean = ys.reduce((a, b) => a + b, 0) / ys.length;
+    gdXStd = Math.sqrt(xs.reduce((a, b) => a + (b - gdXMean) ** 2, 0) / xs.length) || 1;
+    gdYStd = Math.sqrt(ys.reduce((a, b) => a + (b - gdYMean) ** 2, 0) / ys.length) || 1;
+
+    return data.map(p => ({
+        x: (p.x - gdXMean) / gdXStd,
+        y: (p.y - gdYMean) / gdYStd
+    }));
+}
+
+// Convert normalized params back to original space for display
+function denormParams() {
+    const wOrig = gdW * gdYStd / gdXStd;
+    const bOrig = gdYMean - wOrig * gdXMean + gdBias * gdYStd;
+    return { w: wOrig, b: bOrig };
+}
+
+function initGradientDescent() {
+    // Generate training data
+    gdData = [];
+    for (let i = 0; i < 25; i++) {
+        const x = Math.random() * 80 + 10;
+        const y = 0.65 * x + 15 + (Math.random() - 0.5) * 14;
+        gdData.push({ x, y });
+    }
+
+    gdDataNorm = normalizeData(gdData);
+
+    // Fit chart
+    const ctx1 = document.getElementById('gdFitChart').getContext('2d');
+    gdFitChart = new Chart(ctx1, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Training Data',
+                    data: gdData.map(p => ({ x: p.x, y: p.y })),
+                    backgroundColor: 'rgba(14, 116, 144, 0.85)',
+                    borderColor: 'rgba(21, 94, 117, 1)',
+                    borderWidth: 2.5,
+                    pointRadius: 7,
+                    pointHoverRadius: 10,
+                },
+                {
+                    label: 'GD Line',
+                    data: [],
+                    type: 'line',
+                    borderColor: 'rgba(220, 38, 38, 0.9)',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    fill: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 100 },
+            plugins: {
+                title: { display: true, text: 'Line Fitting', color: '#334155', font: { family: 'Inter', size: 14, weight: 600 } },
+                legend: { labels: { color: '#475569', font: { size: 11, weight: 500 } } }
+            },
+            scales: {
+                x: {
+                    min: 0, max: 100,
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 10 } },
+                    border: { color: '#cbd5e1' }
+                },
+                y: {
+                    min: 0, max: 100,
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 10 } },
+                    border: { color: '#cbd5e1' }
+                }
+            }
+        }
+    });
+
+    // Loss chart
+    const ctx2 = document.getElementById('gdLossChart').getContext('2d');
+    gdLossChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'MSE Loss',
+                data: [],
+                borderColor: 'rgba(168, 85, 247, 1)',
+                backgroundColor: 'rgba(168, 85, 247, 0.08)',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 100 },
+            plugins: {
+                title: { display: true, text: 'Loss Curve', color: '#334155', font: { family: 'Inter', size: 14, weight: 600 } },
+                legend: { labels: { color: '#475569', font: { size: 11, weight: 500 } } }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 10 } },
+                    title: { display: true, text: 'Epoch', color: '#334155' },
+                    border: { color: '#cbd5e1' }
+                },
+                y: {
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 10 } },
+                    title: { display: true, text: 'MSE', color: '#334155' },
+                    border: { color: '#cbd5e1' }
+                }
+            }
+        }
+    });
+
+    updateGDLine();
+}
+
+function gdStep() {
+    const lr = parseFloat(document.getElementById('lrSlider').value);
+    const n = gdDataNorm.length;
+
+    let dw = 0, db = 0;
+    for (const p of gdDataNorm) {
+        const pred = gdW * p.x + gdBias;
+        const error = p.y - pred;
+        dw += -2 * p.x * error / n;
+        db += -2 * error / n;
+    }
+
+    gdW -= lr * dw;
+    gdBias -= lr * db;
+
+    // Compute loss on normalized data
+    let loss = 0;
+    for (const p of gdDataNorm) {
+        loss += (p.y - (gdW * p.x + gdBias)) ** 2;
+    }
+    loss /= n;
+
+    // Detect explosion
+    if (!isFinite(loss) || loss > 1e10) {
+        setGDStatus('⚠️ Loss exploded! Reduce learning rate and reset.', true);
+        pauseGD();
+        return loss;
+    }
+
+    gdEpochCount++;
+    gdLossHistory.push(loss);
+
+    return loss;
+}
+
+function updateGDLine() {
+    // Convert from normalized params to original space for drawing
+    const { w, b } = denormParams();
+    gdFitChart.data.datasets[1].data = [
+        { x: 0, y: w * 0 + b },
+        { x: 100, y: w * 100 + b }
+    ];
+    gdFitChart.update();
+}
+
+function fmtNum(val) {
+    if (Math.abs(val) >= 1e6) return val.toExponential(2);
+    if (Math.abs(val) < 0.0001 && val !== 0) return val.toExponential(2);
+    return val.toFixed(4);
+}
+
+function updateGDStats(loss) {
+    const { w, b } = denormParams();
+    document.getElementById('gdEpoch').textContent = gdEpochCount;
+    document.getElementById('gdW').textContent = fmtNum(w);
+    document.getElementById('gdB').textContent = fmtNum(b);
+    document.getElementById('gdLoss').textContent = fmtNum(loss);
+}
+
+function updateGDLossChart() {
+    gdLossChart.data.labels = gdLossHistory.map((_, i) => i + 1);
+    gdLossChart.data.datasets[0].data = gdLossHistory;
+    gdLossChart.update();
+}
+
+function logGDStep(epoch, loss) {
+    const { w, b } = denormParams();
+    const log = document.getElementById('gdLog');
+    const line = document.createElement('div');
+    line.innerHTML = `<span class="epoch">Epoch ${epoch.toString().padStart(3, '0')}</span> | w = ${fmtNum(w)} | b = ${fmtNum(b)} | <span class="loss-val">Loss = ${fmtNum(loss)}</span>`;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+}
+
+function setGDStatus(msg, isWarn) {
+    document.getElementById('gdStatusText').textContent = msg;
+    const box = document.getElementById('gdStatusBox');
+    if (isWarn) {
+        box.className = 'highlight-box warn';
+    } else {
+        box.className = 'highlight-box success';
+    }
+}
+
+function startGD() {
+    if (gdAnimId || gdTimeoutId) return;
+    gdPaused = false;
+
+    document.getElementById('gdStartBtn').style.display = 'none';
+    document.getElementById('gdPauseBtn').style.display = '';
+
+    const maxEpochs = parseInt(document.getElementById('epochSlider').value);
+    let remaining = maxEpochs;
+
+    setGDStatus('🏃 Running...', false);
+
+    function runStep() {
+        if (remaining <= 0 || gdPaused) {
+            gdAnimId = null;
+            gdTimeoutId = null;
+            if (remaining <= 0) {
+                setGDStatus(`✅ Completed ${maxEpochs} epochs!`, false);
+                document.getElementById('gdStartBtn').style.display = '';
+                document.getElementById('gdPauseBtn').style.display = 'none';
+            }
+            return;
+        }
+
+        const loss = gdStep();
+
+        // Stop if exploded
+        if (!isFinite(loss) || loss > 1e10) {
+            gdAnimId = null;
+            gdTimeoutId = null;
+            document.getElementById('gdStartBtn').style.display = '';
+            document.getElementById('gdPauseBtn').style.display = 'none';
+            return;
+        }
+
+        updateGDLine();
+        updateGDStats(loss);
+        updateGDLossChart();
+
+        const logInterval = Math.max(1, Math.floor(maxEpochs / 40));
+        if (gdEpochCount % logInterval === 0 || gdEpochCount <= 5 || remaining <= 1) {
+            logGDStep(gdEpochCount, loss);
+        }
+
+        remaining--;
+
+        const delay = getSpeedDelay();
+        if (delay === 0) {
+            gdAnimId = requestAnimationFrame(runStep);
+        } else {
+            gdTimeoutId = setTimeout(runStep, delay);
+        }
+    }
+
+    runStep();
+}
+
+function pauseGD() {
+    gdPaused = true;
+    if (gdAnimId) { cancelAnimationFrame(gdAnimId); gdAnimId = null; }
+    if (gdTimeoutId) { clearTimeout(gdTimeoutId); gdTimeoutId = null; }
+
+    document.getElementById('gdStartBtn').style.display = '';
+    document.getElementById('gdPauseBtn').style.display = 'none';
+
+    setGDStatus(`⏸️ Paused at epoch ${gdEpochCount}`, false);
+}
+
+function stepGD() {
+    const loss = gdStep();
+    if (!isFinite(loss) || loss > 1e10) return;
+    updateGDLine();
+    updateGDStats(loss);
+    updateGDLossChart();
+    logGDStep(gdEpochCount, loss);
+    setGDStatus(`⏭️ Step ${gdEpochCount} — Loss: ${fmtNum(loss)}`, false);
+}
+
+function resetGD() {
+    if (gdAnimId) { cancelAnimationFrame(gdAnimId); gdAnimId = null; }
+    if (gdTimeoutId) { clearTimeout(gdTimeoutId); gdTimeoutId = null; }
+    gdPaused = false;
+    gdW = 0;
+    gdBias = 0;
+    gdEpochCount = 0;
+    gdLossHistory = [];
+
+    document.getElementById('gdLog').innerHTML = '<div style="color: #777;">// Reset! Click Start or Step to begin...</div>';
+    document.getElementById('gdEpoch').textContent = '0';
+    document.getElementById('gdW').textContent = '0.00';
+    document.getElementById('gdB').textContent = '0.00';
+    document.getElementById('gdLoss').textContent = '—';
+
+    document.getElementById('gdStartBtn').style.display = '';
+    document.getElementById('gdPauseBtn').style.display = 'none';
+
+    setGDStatus('Ready — press Start or Step', false);
+    document.getElementById('gdStatusBox').className = 'highlight-box warn';
+
+    gdLossChart.data.labels = [];
+    gdLossChart.data.datasets[0].data = [];
+    gdLossChart.update();
+
+    updateGDLine();
+}
+
+// ============================================
+// INTERVIEW QUIZ
+// ============================================
+function generateQuiz() {
+    const questions = [
+        {
+            q: "What's the difference between simple and multiple linear regression?",
+            tags: ['tag-google', 'Google'], tagExtra: ['tag-meta', 'Meta'],
+            a: `<strong>Simple Linear Regression</strong> uses exactly <strong>one</strong> independent variable to predict the dependent variable: <code>ŷ = wx + b</code>.<br><br>
+                <strong>Multiple Linear Regression</strong> uses <strong>two or more</strong> independent variables: <code>ŷ = w₁x₁ + w₂x₂ + ... + wₙxₙ + b</code>.<br><br>
+                The core idea is the same — minimize MSE — but multiple regression requires considering <strong>multicollinearity</strong> between features and using <strong>Adjusted R²</strong> instead of R².`
+        },
+        {
+            q: "Why do we use MSE instead of just Mean Error as the loss function?",
+            tags: ['tag-amazon', 'Amazon'], tagExtra: ['tag-google', 'Google'],
+            a: `Mean Error = <code>(1/n) Σ(yᵢ - ŷᵢ)</code> — this can be <strong>zero even with terrible predictions</strong> because positive and negative errors cancel out!<br><br>
+                MSE squares each error, making all terms positive and penalizing large errors disproportionately. It's also <strong>differentiable everywhere</strong>, which is essential for gradient-based optimization.<br><br>
+                <strong>Edge case:</strong> If you have many outliers, MSE will be heavily influenced by them. In such cases, consider <strong>MAE (Mean Absolute Error)</strong> or <strong>Huber Loss</strong> which are more robust.`
+        },
+        {
+            q: "Can R² be negative? When does that happen?",
+            tags: ['tag-netflix', 'Netflix'], tagExtra: ['tag-edge', 'Edge Case'],
+            a: `<strong>Yes!</strong> R² = 1 - (SSres / SStot). If your model is <strong>worse than simply predicting the mean</strong> for every point, then SSres > SStot, making R² negative.<br><br>
+                This happens when:<br>
+                • You fit on training data but evaluate on very different test data<br>
+                • You use a highly inappropriate model<br>
+                • You force the regression through the origin when it shouldn't be<br><br>
+                <strong>Key insight:</strong> A negative R² is a red flag that your model is fundamentally broken — the mean is a better predictor!`
+        },
+        {
+            q: "What happens if features are highly correlated (multicollinearity)?",
+            tags: ['tag-meta', 'Meta'], tagExtra: ['tag-apple', 'Apple'],
+            a: `When features are highly correlated, the <strong>matrix X<sup>T</sup>X becomes near-singular</strong>, making (X<sup>T</sup>X)<sup>-1</sup> numerically unstable. This causes:<br><br>
+                • <strong>Huge variance</strong> in coefficient estimates — they become unreliable<br>
+                • Coefficients can flip signs or have wildly large values<br>
+                • Model still predicts well overall, but individual feature importance is meaningless<br><br>
+                <strong>Detection:</strong> Compute VIF (Variance Inflation Factor). VIF > 5 is concerning, VIF > 10 is severe.<br>
+                <strong>Solutions:</strong> Drop correlated features, use PCA, or apply Ridge regression (L2 regularization).`
+        },
+        {
+            q: "When would you prefer Gradient Descent over the Normal Equation?",
+            tags: ['tag-google', 'Google'], tagExtra: ['tag-amazon', 'Amazon'],
+            a: `<strong>Normal Equation:</strong> θ = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y<br>
+                • Complexity: O(d³) where d = number of features<br>
+                • No hyperparameters to tune<br>
+                • Computes exact solution in one step<br>
+                • ❌ Fails when d is large (>10K features) or X<sup>T</sup>X is singular<br><br>
+                <strong>Gradient Descent:</strong><br>
+                • Complexity: O(n·d) per iteration<br>
+                • Requires choosing learning rate & epochs<br>
+                • Works with any differentiable loss function<br>
+                • ✅ Scales to millions of features and data points<br>
+                • ✅ Can be used for online learning (streaming data)<br><br>
+                <strong>Rule of thumb:</strong> Use Normal Equation when d < 10,000 and n is manageable. Use GD for everything else.`
+        },
+        {
+            q: "What is the bias-variance tradeoff in the context of linear regression?",
+            tags: ['tag-apple', 'Apple'], tagExtra: ['tag-netflix', 'Netflix'],
+            a: `<strong>Bias</strong> = Error from overly simplistic assumptions (underfitting). A linear model fitting quadratic data has high bias.<br><br>
+                <strong>Variance</strong> = Error from sensitivity to fluctuations in training data (overfitting). A high-degree polynomial changes drastically with small data changes.<br><br>
+                <strong>Total Error</strong> = Bias² + Variance + Irreducible Noise<br><br>
+                • Plain linear regression → <strong>high bias, low variance</strong><br>
+                • Polynomial regression (degree 20) → <strong>low bias, high variance</strong><br>
+                • Ridge/Lasso → <strong>introduces slight bias to significantly reduce variance</strong><br><br>
+                <strong>Interview gold:</strong> "Regularization is explicitly trading bias for variance."`
+        },
+        {
+            q: "How do you handle outliers in linear regression?",
+            tags: ['tag-amazon', 'Amazon'], tagExtra: ['tag-edge', 'Edge Case'],
+            a: `Outliers disproportionately affect OLS because MSE squares the errors. Strategies:<br><br>
+                1. <strong>Detect:</strong> Use Cook's Distance, leverage values, or studentized residuals<br>
+                2. <strong>Robust regression:</strong> Use Huber loss or RANSAC (Random Sample Consensus)<br>
+                3. <strong>Transform:</strong> Apply log/sqrt transformation to compress the scale<br>
+                4. <strong>Winsorize:</strong> Cap extreme values at a percentile (e.g., 1st/99th)<br>
+                5. <strong>Use MAE:</strong> Replace MSE with MAE (L1 loss) — less sensitive to outliers<br><br>
+                <strong>Edge case:</strong> Sometimes "outliers" are actually the most important data points (fraud detection!). Always investigate before removing!`
+        },
+        {
+            q: "Explain the difference between L1 (Lasso) and L2 (Ridge) regularization geometrically.",
+            tags: ['tag-google', 'Google'], tagExtra: ['tag-meta', 'Meta'],
+            a: `<strong>Geometrically:</strong><br>
+                • <strong>L2 (Ridge):</strong> The constraint region is a <strong>circle</strong> (sphere in higher dims). The MSE contours will typically touch the circle at a non-zero point → weights shrink but rarely become exactly zero.<br><br>
+                • <strong>L1 (Lasso):</strong> The constraint region is a <strong>diamond</strong> (cross-polytope). The MSE contours are more likely to touch at a <strong>corner</strong> where one or more weights = 0 → automatic feature selection!<br><br>
+                <strong>Why Lasso gives sparse solutions:</strong> Diamond corners lie on the axes. Since the optimal point often hits a corner, some coefficients become exactly zero. This is why Lasso is preferred when you suspect many features are irrelevant.<br><br>
+                <strong>Elastic Net</strong> = rounded diamond → benefits of both.`
+        },
+        {
+            q: "What happens when you apply linear regression to a classification problem?",
+            tags: ['tag-netflix', 'Netflix'], tagExtra: ['tag-edge', 'Edge Case'],
+            a: `You <em>can</em> use it, but it's problematic:<br><br>
+                • Predictions can go <strong>below 0 or above 1</strong> — meaningless as probabilities<br>
+                • The decision boundary is still linear (same as logistic regression)<br>
+                • MSE is not a proper loss for binary outcomes — probabilities are better optimized with <strong>cross-entropy loss</strong><br>
+                • With more than 2 classes, linear regression assigns arbitrary numeric values to categories, creating fake ordinal relationships<br><br>
+                <strong>The fix:</strong> Apply a <strong>sigmoid function</strong> σ(z) = 1/(1+e<sup>-z</sup>) to the linear output → <strong>Logistic Regression</strong>. Same linear model underneath, but with proper probabilistic output!<br><br>
+                <strong>Interview tip:</strong> Logistic regression IS linear regression + sigmoid + cross-entropy loss. The "regression" in the name is historical.`
+        },
+        {
+            q: "How does feature scaling affect linear regression and gradient descent?",
+            tags: ['tag-apple', 'Apple'], tagExtra: ['tag-amazon', 'Amazon'],
+            a: `<strong>For the Normal Equation:</strong> Feature scaling does NOT affect the solution. The math finds the same optimal parameters regardless of scale.<br><br>
+                <strong>For Gradient Descent:</strong> Feature scaling is <strong>crucial!</strong> Without it:<br>
+                • The cost function contours become elongated ellipses instead of circles<br>
+                • GD oscillates along the steep direction and crawls along the flat one<br>
+                • Convergence becomes <strong>orders of magnitude slower</strong><br><br>
+                <strong>Common scaling methods:</strong><br>
+                • <strong>Standardization:</strong> z = (x - μ) / σ → mean=0, std=1<br>
+                • <strong>Min-Max:</strong> x' = (x - min) / (max - min) → range [0, 1]<br><br>
+                <strong>Edge case:</strong> When using regularization (Ridge/Lasso), you MUST scale features. Otherwise, the penalty unfairly penalizes large-scale features more than small-scale ones.`
+        },
+        {
+            q: "What is heteroscedasticity and how do you detect and fix it?",
+            tags: ['tag-meta', 'Meta'], tagExtra: ['tag-edge', 'Edge Case'],
+            a: `<strong>Heteroscedasticity</strong> = the variance of residuals is NOT constant across values of X. Example: house price prediction errors grow larger for expensive houses.<br><br>
+                <strong>Detection:</strong><br>
+                • <strong>Visual:</strong> Plot residuals vs. fitted values — look for a "funnel" or "fan" shape<br>
+                • <strong>Breusch-Pagan test:</strong> Regress squared residuals on X; significant = heteroscedastic<br>
+                • <strong>White's test:</strong> More general; doesn't assume a specific form<br><br>
+                <strong>Consequences:</strong> OLS estimates are still <em>unbiased</em> but no longer <em>efficient</em> (not BLUE). Standard errors are wrong → hypothesis tests are invalid!<br><br>
+                <strong>Solutions:</strong><br>
+                • Use <strong>Weighted Least Squares (WLS)</strong><br>
+                • Apply <strong>log transformation</strong> to the dependent variable<br>
+                • Use <strong>robust standard errors</strong> (Huber-White sandwich estimator)<br>
+                • Use <strong>Generalized Least Squares (GLS)</strong>`
+        },
+        {
+            q: "You trained a linear regression model and got R² = 0.99 on the test set. Should you be happy?",
+            tags: ['tag-google', 'Google'], tagExtra: ['tag-edge', 'Edge Case'],
+            a: `<strong>Not necessarily!</strong> Be suspicious of very high R². Investigate:<br><br>
+                1. <strong>Data leakage:</strong> Is a feature that's essentially the target (or derived from it) included? Example: predicting revenue with "profit" as a feature.<br>
+                2. <strong>Target leakage:</strong> Is information from the future leaking into your training data?<br>
+                3. <strong>Duplicate/near-duplicate data:</strong> Are test samples also in the training set?<br>
+                4. <strong>Overfitting:</strong> Check train vs test R². If train = 0.999 and test = 0.99, might be okay. If test ≈ train and both ≈ 0.99, check for leakage.<br>
+                5. <strong>Trivial problem:</strong> Some relationships are genuinely near-perfect (e.g., converting Celsius to Fahrenheit).<br><br>
+                <strong>Interview answer:</strong> "I'd first check for data leakage, then validate with cross-validation, then examine whether the features make causal sense."`
+        },
+    ];
+
+    const container = document.getElementById('quizContainer');
+
+    questions.forEach((q, i) => {
+        const item = document.createElement('div');
+        item.className = 'quiz-item';
+        item.innerHTML = `
+            <div class="quiz-question" onclick="toggleQuiz(this)">
+                <div style="display: flex; align-items: center;">
+                    <span class="q-number">Q${(i + 1).toString().padStart(2, '0')}</span>
+                    <span>${q.q}</span>
+                </div>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="quiz-answer">
+                <div class="quiz-answer-inner">
+                    <div style="margin-bottom: 12px;">
+                        <span class="tag ${q.tags[0]}">${q.tags[1]}</span>
+                        ${q.tagExtra ? `<span class="tag ${q.tagExtra[0]}">${q.tagExtra[1]}</span>` : ''}
+                    </div>
+                    ${q.a}
+                </div>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+function toggleQuiz(el) {
+    const item = el.parentElement;
+    const answer = item.querySelector('.quiz-answer');
+    const isOpen = item.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.quiz-item').forEach(qi => {
+        qi.classList.remove('open');
+        qi.querySelector('.quiz-answer').style.maxHeight = '0';
+    });
+
+    if (!isOpen) {
+        item.classList.add('open');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+}
+
+</script>
+
+</body>
+</html>
