@@ -861,6 +861,263 @@
             font-style: italic;
             margin-bottom: 16px;
         }
+
+        /* ============================================
+           RESEARCH: EXPERIMENT CONTROLS
+        ============================================ */
+        .research-controls {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            align-items: flex-end;
+        }
+
+        .research-control-group {
+            flex: 1;
+            min-width: 170px;
+        }
+
+        .research-control-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .research-control-group input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #e2e4ed;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .research-control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-1);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(108, 99, 255, 0.4);
+        }
+
+        .research-control-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #dde0ea;
+            background: #f4f5fb;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .btn-sm {
+            padding: 7px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+        }
+
+        .btn-warn {
+            background: rgba(217, 119, 6, 0.1);
+            border-color: rgba(217, 119, 6, 0.25);
+            color: #b45309;
+        }
+
+        .btn-warn:hover {
+            background: rgba(217, 119, 6, 0.2);
+        }
+
+        .btn-success {
+            background: rgba(5, 150, 105, 0.1);
+            border-color: rgba(5, 150, 105, 0.25);
+            color: #047857;
+        }
+
+        .btn-success:hover {
+            background: rgba(5, 150, 105, 0.2);
+        }
+
+        /* Residual vs Fitted chart */
+        .dual-chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dual-chart-grid { grid-template-columns: 1fr; }
+        }
+
+        /* AI Hint Panel */
+        .ai-hint-panel {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.06), rgba(230, 57, 118, 0.04));
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            border-left: 4px solid var(--accent-1);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .ai-hint-panel.visible {
+            display: block;
+            animation: fadeSlideIn 0.4s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-hint-panel .hint-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--accent-1);
+            margin-bottom: 10px;
+        }
+
+        .ai-hint-panel .hint-body {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .ai-hint-panel .hint-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Train/Test indicator */
+        .train-test-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-train { background: rgba(108, 99, 255, 0.12); color: var(--accent-1); }
+        .badge-test { background: rgba(230, 57, 118, 0.12); color: var(--accent-2); }
+
+        /* Research Pre/Post Quiz */
+        .quiz-research {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 36px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .quiz-research .quiz-q {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #f8f9fc;
+            border-radius: var(--radius-sm);
+            border: 1px solid #e2e4ed;
+        }
+
+        .quiz-research .quiz-q h4 {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .quiz-research .quiz-option {
+            display: block;
+            padding: 10px 16px;
+            margin: 6px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e4ed;
+            background: white;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+        }
+
+        .quiz-research .quiz-option:hover {
+            border-color: var(--accent-1);
+            background: rgba(108, 99, 255, 0.04);
+        }
+
+        .quiz-research .quiz-option.selected {
+            border-color: var(--accent-1);
+            background: rgba(108, 99, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .quiz-research .quiz-option.correct {
+            border-color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+        }
+
+        .quiz-research .quiz-option.incorrect {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.08);
+        }
+
+        .quiz-score-display {
+            text-align: center;
+            padding: 24px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.08), rgba(5, 150, 105, 0.08));
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            margin-top: 20px;
+        }
+
+        .quiz-score-display .score-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Research Mode Banner */
+        .research-banner {
+            background: linear-gradient(135deg, #6c63ff, #e63976);
+            color: white;
+            text-align: center;
+            padding: 8px 16px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        /* Log viewer */
+        .log-viewer {
+            background: #1e1e2e;
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            line-height: 1.6;
+            color: #b4b4cc;
+            margin-top: 12px;
+        }
     </style>
 </head>
 <body>
@@ -887,6 +1144,7 @@
             <a href="#gradient-descent">Gradient Descent</a>
             <a href="#assumptions">Assumptions</a>
             <a href="#metrics">Metrics</a>
+            <a href="#research-quiz">📝 Quiz</a>
             <a href="#interview">Interview Q&A</a>
         </div>
     </div>
@@ -1105,11 +1363,41 @@
                     <button class="btn" onclick="generateSampleData('linear')">📈 Linear Data</button>
                     <button class="btn" onclick="generateSampleData('noisy')">🌊 Noisy Data</button>
                     <button class="btn" onclick="generateSampleData('quadratic')">🔄 Non-Linear</button>
+                    <button class="btn" onclick="generateSampleData('heteroscedastic')">📊 Heteroscedastic</button>
                     <button class="btn btn-danger" onclick="clearPlayground()">🗑️ Clear</button>
                 </div>
             </div>
 
-            <p class="click-instruction">💡 Click anywhere on the chart below to add data points, or use the preset buttons above.</p>
+            <!-- Research Controls: Noise, Outliers, Transforms -->
+            <div class="research-controls">
+                <div class="research-control-group">
+                    <label>🎚️ Noise Level</label>
+                    <input type="range" id="noiseSlider" min="0" max="50" step="1" value="0"
+                           oninput="document.getElementById('noiseVal').textContent = this.value; applyNoise();">
+                    <div class="range-value" id="noiseVal">0</div>
+                </div>
+                <div class="research-control-group">
+                    <label>� Transform</label>
+                    <select id="transformSelect" onchange="applyTransform()">
+                        <option value="none">None (raw)</option>
+                        <option value="logY">log(Y)</option>
+                        <option value="logX">log(X)</option>
+                        <option value="sqrtY">√Y</option>
+                    </select>
+                </div>
+                <div class="research-control-group">
+                    <label>✂️ Train/Test Split</label>
+                    <input type="range" id="trainSplitSlider" min="50" max="100" step="5" value="100"
+                           oninput="document.getElementById('trainSplitVal').textContent = this.value + '%'; updatePlayground();">
+                    <div class="range-value" id="trainSplitVal">100%</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+                <button class="btn btn-sm btn-warn" onclick="addOutlier()">💥 Add Outlier</button>
+                <button class="btn btn-sm btn-warn" onclick="addLeveragePoint()">📌 Add Leverage Point</button>
+                <button class="btn btn-sm btn-success" onclick="removeLastPoint()">↩️ Undo Last Point</button>
+            </div>
 
             <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 10px; flex-wrap: wrap;">
                 <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">
@@ -1123,10 +1411,25 @@
                     <span style="display:inline-block;width:12px;height:3px;background:rgba(220,38,38,0.7);margin-right:4px;vertical-align:middle;"></span>
                     Below line
                 </span>
+                <span id="trainTestBadges" style="display:none;">
+                    <span class="train-test-badge badge-train">● Train</span>
+                    <span class="train-test-badge badge-test">● Test</span>
+                </span>
             </div>
 
-            <div class="chart-container">
-                <canvas id="playgroundChart"></canvas>
+            <div class="dual-chart-grid">
+                <div>
+                    <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Scatter + Fitted Line</div>
+                    <div class="chart-container">
+                        <canvas id="playgroundChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Residuals vs Fitted Values</div>
+                    <div class="chart-container">
+                        <canvas id="residualChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div class="stats-row" id="playgroundStats">
@@ -1147,8 +1450,16 @@
                     <div class="stat-value" id="statR2">—</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">MSE</div>
+                    <div class="stat-label">Train MSE</div>
                     <div class="stat-value" id="statMSE">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Test RMSE</div>
+                    <div class="stat-value" id="statTestRMSE">—</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Cook's D (max)</div>
+                    <div class="stat-value" id="statCooksD">—</div>
                 </div>
             </div>
 
@@ -1156,6 +1467,18 @@
                 <div class="eq-label">Current Fitted Equation</div>
                 <div id="fittedEquation" style="font-size: 1.1rem; color: var(--accent-3); font-family: 'JetBrains Mono', monospace;">
                     ŷ = ? · x + ?
+                </div>
+            </div>
+
+            <!-- AI Hint Panel (only shown in AI mode) -->
+            <div class="ai-hint-panel" id="aiHintPanel">
+                <div class="hint-header">🤖 AI Diagnostic Feedback</div>
+                <div class="hint-body" id="aiHintBody">
+                    Fit a model to see AI-generated diagnostics.
+                </div>
+                <div class="hint-actions">
+                    <button class="btn btn-sm" onclick="requestNextHint()">💡 Give me a deeper hint</button>
+                    <button class="btn btn-sm" onclick="dismissHint()">✓ Got it</button>
                 </div>
             </div>
         </div>
@@ -1465,6 +1788,29 @@
 </section>
 
 <!-- ============================================
+     SECTION — RESEARCH PRE/POST QUIZ
+============================================ -->
+<section id="research-quiz">
+    <div class="container">
+        <div class="section-label fade-in">📝 Research Assessment</div>
+        <h2 class="section-title fade-in">Regression Concepts Quiz</h2>
+        <p class="section-desc fade-in">
+            Test your understanding of regression assumptions, diagnostics, and interpretation.
+            <strong>Your score helps us improve this tool.</strong>
+        </p>
+
+        <div class="quiz-research fade-in" id="researchQuizContainer">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="startResearchQuiz('pre')" id="quizPreBtn">Start Pre-Test</button>
+                <button class="btn btn-primary" onclick="startResearchQuiz('post')" id="quizPostBtn" style="display:none;">Start Post-Test</button>
+            </div>
+            <div id="researchQuizBody"></div>
+            <div id="researchQuizScore" style="display:none;"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
      SECTION 8 — INTERVIEW Q&A
 ============================================ -->
 <section id="interview">
@@ -1492,8 +1838,22 @@
         <p style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);">
             All equations rendered with KaTeX • Charts powered by Chart.js
         </p>
+        <details style="margin-top: 16px; text-align: left;">
+            <summary style="cursor: pointer; font-size: 0.78rem; color: var(--text-muted);">📊 Research Interaction Log (for researchers)</summary>
+            <div class="log-viewer" id="interactionLogViewer">// Interaction log will appear here...</div>
+            <button class="btn btn-sm" style="margin-top: 8px;" onclick="downloadLog()">⬇️ Download Log (JSON)</button>
+        </details>
     </div>
 </footer>
+
+<!-- Research Mode Banner -->
+<div class="research-banner" id="researchBanner">
+    🔬 Research Mode: <span id="researchGroupLabel">Group A (No AI Hints)</span> •
+    Session: <span id="sessionId">—</span> •
+    Actions logged: <span id="actionCount">0</span>
+    &nbsp; | &nbsp;
+    <button onclick="toggleResearchGroup()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.72rem; cursor: pointer;">Switch Group</button>
+</div>
 
 <!-- ============================================
      JAVASCRIPT
@@ -1568,10 +1928,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize everything
     initPlayground();
+    initResidualChart();
     initGradientDescent();
     generateQuiz();
     initScrollAnimations();
     initProgressBar();
+    updateResearchBanner();
+    updateAIHintVisibility();
+    logAction('session', 'start', { group: RESEARCH.group, userAgent: navigator.userAgent });
 });
 
 // ============================================
@@ -1633,10 +1997,85 @@ const residualPlugin = {
 Chart.register(residualPlugin);
 
 // ============================================
+// RESEARCH INFRASTRUCTURE — Logging, Session, A/B Groups
+// ============================================
+const RESEARCH = {
+    sessionId: 'S-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    group: new URLSearchParams(window.location.search).get('mode') === 'ai' ? 'B' : 'A',
+    log: [],
+    actionCount: 0,
+    startTime: Date.now(),
+    quizScores: { pre: null, post: null },
+};
+
+function logAction(category, action, details = {}) {
+    const entry = {
+        ts: new Date().toISOString(),
+        elapsed: ((Date.now() - RESEARCH.startTime) / 1000).toFixed(1),
+        session: RESEARCH.sessionId,
+        group: RESEARCH.group,
+        category,
+        action,
+        ...details
+    };
+    RESEARCH.log.push(entry);
+    RESEARCH.actionCount++;
+    // Update UI
+    const countEl = document.getElementById('actionCount');
+    if (countEl) countEl.textContent = RESEARCH.actionCount;
+    // Append to log viewer
+    const viewer = document.getElementById('interactionLogViewer');
+    if (viewer) {
+        const line = document.createElement('div');
+        line.textContent = `[${entry.elapsed}s] ${category}::${action} ${JSON.stringify(details)}`;
+        viewer.appendChild(line);
+        viewer.scrollTop = viewer.scrollHeight;
+    }
+}
+
+function downloadLog() {
+    const blob = new Blob([JSON.stringify(RESEARCH.log, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `linreg-log-${RESEARCH.sessionId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function toggleResearchGroup() {
+    RESEARCH.group = RESEARCH.group === 'A' ? 'B' : 'A';
+    updateResearchBanner();
+    updateAIHintVisibility();
+    logAction('research', 'switch_group', { newGroup: RESEARCH.group });
+}
+
+function updateResearchBanner() {
+    const label = document.getElementById('researchGroupLabel');
+    if (label) {
+        label.textContent = RESEARCH.group === 'A' ? 'Group A (No AI Hints)' : 'Group B (AI Hints Active)';
+    }
+    const sid = document.getElementById('sessionId');
+    if (sid) sid.textContent = RESEARCH.sessionId;
+}
+
+function updateAIHintVisibility() {
+    const panel = document.getElementById('aiHintPanel');
+    if (!panel) return;
+    if (RESEARCH.group === 'B') {
+        // AI hints are allowed — actual show/hide handled by detection
+    } else {
+        panel.classList.remove('visible');
+    }
+}
+
+// ============================================
 // PLAYGROUND — Interactive Scatter Plot
 // ============================================
 let playgroundChart;
+let residualScatterChart;
 let dataPoints = [];
+let rawDataPoints = []; // before transforms
 
 function initPlayground() {
     const ctx = document.getElementById('playgroundChart').getContext('2d');
@@ -1725,46 +2164,225 @@ function initPlayground() {
     });
 }
 
+function initResidualChart() {
+    const ctx = document.getElementById('residualChart').getContext('2d');
+    residualScatterChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Residuals',
+                    data: [],
+                    backgroundColor: 'rgba(108, 99, 255, 0.7)',
+                    borderColor: 'rgba(49, 46, 129, 0.9)',
+                    borderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 9,
+                },
+                {
+                    label: 'Zero Line',
+                    data: [],
+                    type: 'line',
+                    borderColor: 'rgba(220, 38, 38, 0.6)',
+                    borderWidth: 2,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 300 },
+            plugins: {
+                legend: { labels: { color: '#334155', font: { family: 'Inter', size: 12, weight: 500 } } }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 11 } },
+                    title: { display: true, text: 'Fitted Values (ŷ)', color: '#334155', font: { family: 'Inter', size: 13, weight: 600 } },
+                    border: { color: '#cbd5e1' }
+                },
+                y: {
+                    grid: { color: 'rgba(100, 116, 139, 0.12)' },
+                    ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 11 } },
+                    title: { display: true, text: 'Residual (y - ŷ)', color: '#334155', font: { family: 'Inter', size: 13, weight: 600 } },
+                    border: { color: '#cbd5e1' }
+                }
+            }
+        }
+    });
+}
+
+function updateResidualChart(points, w, b) {
+    if (!residualScatterChart) return;
+    const residuals = points.map(p => ({ x: w * p.x + b, y: p.y - (w * p.x + b) }));
+    residualScatterChart.data.datasets[0].data = residuals;
+    // Zero line
+    const fittedVals = residuals.map(r => r.x);
+    const minF = Math.min(...fittedVals) - 5;
+    const maxF = Math.max(...fittedVals) + 5;
+    residualScatterChart.data.datasets[1].data = [{ x: minF, y: 0 }, { x: maxF, y: 0 }];
+    residualScatterChart.update();
+}
+
+function clearResidualChart() {
+    if (!residualScatterChart) return;
+    residualScatterChart.data.datasets[0].data = [];
+    residualScatterChart.data.datasets[1].data = [];
+    residualScatterChart.update();
+}
+
 function addPoint(x, y) {
     dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
+    rawDataPoints.push({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
+    logAction('playground', 'add_point', { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
+    updatePlayground();
+}
+
+function addOutlier() {
+    if (dataPoints.length < 3) { alert('Add at least 3 points first!'); return; }
+    const { w, b } = computeOLS(dataPoints);
+    // Place a point far from the line in the middle X range
+    const midX = 40 + Math.random() * 20;
+    const predicted = w * midX + b;
+    const outlierY = Math.max(0, Math.min(100, predicted + (Math.random() > 0.5 ? 1 : -1) * (30 + Math.random() * 20)));
+    addPoint(midX, outlierY);
+    logAction('playground', 'add_outlier', { x: midX, y: outlierY });
+}
+
+function addLeveragePoint() {
+    if (dataPoints.length < 3) { alert('Add at least 3 points first!'); return; }
+    // Extreme X value with moderate Y deviation
+    const extremeX = Math.random() > 0.5 ? 95 + Math.random() * 5 : Math.random() * 5;
+    const { w, b } = computeOLS(dataPoints);
+    const leverageY = Math.max(0, Math.min(100, w * extremeX + b + (Math.random() - 0.5) * 30));
+    addPoint(extremeX, leverageY);
+    logAction('playground', 'add_leverage', { x: extremeX, y: leverageY });
+}
+
+function removeLastPoint() {
+    if (dataPoints.length === 0) return;
+    dataPoints.pop();
+    rawDataPoints.pop();
+    logAction('playground', 'undo_point');
+    updatePlayground();
+}
+
+function applyNoise() {
+    const noiseLevel = parseInt(document.getElementById('noiseSlider').value);
+    if (rawDataPoints.length === 0) return;
+    // Re-derive dataPoints from rawDataPoints + noise
+    dataPoints = rawDataPoints.map(p => ({
+        x: p.x,
+        y: Math.max(0, Math.min(100, Math.round((p.y + (Math.random() - 0.5) * noiseLevel * 2) * 10) / 10))
+    }));
+    logAction('playground', 'apply_noise', { noiseLevel });
     updatePlayground();
 }
 
 function updatePlayground() {
-    playgroundChart.data.datasets[0].data = [...dataPoints];
+    const trainPct = parseInt(document.getElementById('trainSplitSlider').value) / 100;
+    const isSplit = trainPct < 1;
 
-    if (dataPoints.length >= 2) {
-        const { w, b, r2, mse } = computeOLS(dataPoints);
+    // Shuffle + split
+    let trainPoints = [...dataPoints];
+    let testPoints = [];
+    if (isSplit && dataPoints.length >= 4) {
+        const shuffled = [...dataPoints].sort(() => Math.random() - 0.5);
+        const splitIdx = Math.max(2, Math.floor(shuffled.length * trainPct));
+        trainPoints = shuffled.slice(0, splitIdx);
+        testPoints = shuffled.slice(splitIdx);
+    }
 
-        // Draw regression line
+    // Show/hide train-test badges
+    const badges = document.getElementById('trainTestBadges');
+    if (badges) badges.style.display = isSplit && dataPoints.length >= 4 ? 'inline' : 'none';
+
+    // Update scatter: show all points (train=blue, test=pink)
+    playgroundChart.data.datasets[0].data = [...trainPoints];
+    // Add test points as separate visual if split
+    if (playgroundChart.data.datasets.length < 4) {
+        playgroundChart.data.datasets.push({
+            label: 'Test Points',
+            data: [],
+            backgroundColor: 'rgba(230, 57, 118, 0.8)',
+            borderColor: 'rgba(190, 24, 93, 1)',
+            borderWidth: 2,
+            pointRadius: 8,
+            pointHoverRadius: 11,
+            pointStyle: 'triangle',
+        });
+    }
+    playgroundChart.data.datasets[3].data = testPoints;
+
+    if (trainPoints.length >= 2) {
+        const { w, b, r2, mse } = computeOLS(trainPoints);
+
+        // Regression line
         const xMin = 0, xMax = 100;
         playgroundChart.data.datasets[1].data = [
             { x: xMin, y: w * xMin + b },
             { x: xMax, y: w * xMax + b }
         ];
 
-        // Draw residual lines (vertical dashes from each point to the line)
-        // We use a custom plugin for this
+        // Residual lines on train
         const showRes = document.getElementById('showResiduals') && document.getElementById('showResiduals').checked;
-        playgroundChart.residualData = showRes ? dataPoints.map(p => ({
-            x: p.x,
-            yActual: p.y,
-            yPred: w * p.x + b
+        playgroundChart.residualData = showRes ? trainPoints.map(p => ({
+            x: p.x, yActual: p.y, yPred: w * p.x + b
         })) : null;
+
+        // Update residual vs fitted chart
+        updateResidualChart(trainPoints, w, b);
+
+        // Cook's Distance (simplified)
+        const n = trainPoints.length;
+        const p_param = 2; // slope + intercept
+        const mseVal = mse;
+        let maxCooksD = 0;
+        for (const pt of trainPoints) {
+            const yHat = w * pt.x + b;
+            const residual = pt.y - yHat;
+            const xMean = trainPoints.reduce((s, q) => s + q.x, 0) / n;
+            const leverage = 1/n + (pt.x - xMean)**2 / trainPoints.reduce((s, q) => s + (q.x - xMean)**2, 0);
+            const cooksD = (residual**2 / (p_param * mseVal)) * (leverage / (1 - leverage)**2);
+            if (cooksD > maxCooksD) maxCooksD = cooksD;
+        }
+
+        // Test RMSE
+        let testRMSE = '—';
+        if (testPoints.length > 0) {
+            let testSSE = 0;
+            for (const pt of testPoints) {
+                testSSE += (pt.y - (w * pt.x + b)) ** 2;
+            }
+            testRMSE = Math.sqrt(testSSE / testPoints.length).toFixed(4);
+        }
 
         // Update stats
         document.getElementById('statW').textContent = w.toFixed(4);
         document.getElementById('statB').textContent = b.toFixed(4);
         document.getElementById('statR2').textContent = r2.toFixed(4);
         document.getElementById('statMSE').textContent = mse.toFixed(4);
+        document.getElementById('statTestRMSE').textContent = testRMSE;
+        document.getElementById('statCooksD').textContent = maxCooksD.toFixed(4);
         document.getElementById('fittedEquation').textContent = `ŷ = ${w.toFixed(4)} · x + ${b.toFixed(4)}`;
+
+        // Run AI diagnostics (Group B only)
+        runDiagnostics(trainPoints, w, b, r2, mse, maxCooksD, testRMSE);
+
     } else {
         playgroundChart.data.datasets[1].data = [];
         playgroundChart.residualData = null;
+        clearResidualChart();
         document.getElementById('statW').textContent = '—';
         document.getElementById('statB').textContent = '—';
         document.getElementById('statR2').textContent = '—';
         document.getElementById('statMSE').textContent = '—';
+        document.getElementById('statTestRMSE').textContent = '—';
+        document.getElementById('statCooksD').textContent = '—';
         document.getElementById('fittedEquation').textContent = 'ŷ = ? · x + ?';
     }
 
@@ -1824,13 +2442,47 @@ function generateSampleData(type) {
             const y = 0.015 * (x - 50) ** 2 + 20 + (Math.random() - 0.5) * 10;
             dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.max(0, Math.min(100, Math.round(y * 10) / 10)) });
         }
+    } else if (type === 'heteroscedastic') {
+        for (let i = 0; i < 35; i++) {
+            const x = Math.random() * 80 + 10;
+            const noise = (Math.random() - 0.5) * (x * 0.5); // variance grows with X
+            const y = 0.5 * x + 15 + noise;
+            dataPoints.push({ x: Math.round(x * 10) / 10, y: Math.max(0, Math.min(100, Math.round(y * 10) / 10)) });
+        }
     }
 
+    rawDataPoints = dataPoints.map(p => ({ ...p }));
+    document.getElementById('noiseSlider').value = 0;
+    document.getElementById('noiseVal').textContent = '0';
+    document.getElementById('transformSelect').value = 'none';
+    logAction('playground', 'generate_data', { type, count: dataPoints.length });
+    updatePlayground();
+}
+
+function applyTransform() {
+    const transform = document.getElementById('transformSelect').value;
+    if (rawDataPoints.length === 0) return;
+    dataPoints = rawDataPoints.map(p => {
+        let x = p.x, y = p.y;
+        if (transform === 'logY') y = y > 0 ? Math.log(y) * 20 : 0; // scaled for visibility
+        if (transform === 'logX') x = x > 0 ? Math.log(x) * 20 : 0;
+        if (transform === 'sqrtY') y = Math.sqrt(Math.max(0, y)) * 10;
+        return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+    });
+    logAction('playground', 'transform', { transform });
     updatePlayground();
 }
 
 function clearPlayground() {
     dataPoints = [];
+    rawDataPoints = [];
+    document.getElementById('noiseSlider').value = 0;
+    document.getElementById('noiseVal').textContent = '0';
+    document.getElementById('transformSelect').value = 'none';
+    document.getElementById('trainSplitSlider').value = 100;
+    document.getElementById('trainSplitVal').textContent = '100%';
+    clearResidualChart();
+    logAction('playground', 'clear');
     updatePlayground();
 }
 
@@ -1845,6 +2497,130 @@ function toggleResiduals() {
 // Override to respect toggle
 const _origUpdatePlayground = updatePlayground;
 // (residual toggle is handled within updatePlayground via the checkbox check)
+
+// ============================================
+// AI DIAGNOSTIC ENGINE — Rule-based misconception detection
+// ============================================
+let currentHintLevel = 0;
+let currentDiagnostic = null;
+
+const DIAGNOSTIC_RULES = [
+    {
+        id: 'nonlinearity',
+        detect: (pts, w, b, r2) => {
+            // Check if polynomial fit is much better: proxy by checking residual pattern
+            if (pts.length < 8) return false;
+            const residuals = pts.map(p => p.y - (w * p.x + b));
+            const sorted = [...pts].sort((a, b) => a.x - b.x);
+            const sortedRes = sorted.map(p => p.y - (w * p.x + b));
+            // Count sign changes - linear should have many, curved has few
+            let signChanges = 0;
+            for (let i = 1; i < sortedRes.length; i++) {
+                if (sortedRes[i] * sortedRes[i-1] < 0) signChanges++;
+            }
+            const expectedChanges = pts.length * 0.35;
+            return signChanges < expectedChanges && r2 < 0.85;
+        },
+        hints: [
+            "🔍 Your residual plot shows a systematic pattern. What does that suggest about linearity?",
+            "💡 Try transforming Y (log or √) and compare the residual plot. Does the pattern disappear?",
+            "📖 When residuals show a curve, the relationship isn't linear. A polynomial term or log transform may help. This violates Assumption 1 (Linearity)."
+        ]
+    },
+    {
+        id: 'heteroscedasticity',
+        detect: (pts, w, b) => {
+            if (pts.length < 10) return false;
+            const sorted = [...pts].sort((a, b) => a.x - b.x);
+            const half = Math.floor(sorted.length / 2);
+            const lowVar = sorted.slice(0, half).reduce((s, p) => s + (p.y - (w*p.x+b))**2, 0) / half;
+            const highVar = sorted.slice(half).reduce((s, p) => s + (p.y - (w*p.x+b))**2, 0) / (sorted.length - half);
+            return Math.max(lowVar, highVar) / (Math.min(lowVar, highVar) + 0.001) > 3;
+        },
+        hints: [
+            "🔍 Look at your residual plot — do the residuals spread out (or shrink) as fitted values increase?",
+            "💡 This 'funnel shape' is called heteroscedasticity. Try log(Y) to stabilize the variance.",
+            "📖 Heteroscedasticity means the error variance isn't constant. OLS is still unbiased but no longer efficient (not BLUE). Use log transform or Weighted Least Squares."
+        ]
+    },
+    {
+        id: 'influential_point',
+        detect: (pts, w, b, r2, mse, maxCooksD) => {
+            return maxCooksD > 0.5;
+        },
+        hints: [
+            "🔍 One data point has very high Cook's Distance. Is it driving your entire regression line?",
+            "💡 Try removing it (Undo Last Point) and see how much the slope and R² change.",
+            "📖 Points with high Cook's Distance are 'influential' — they disproportionately affect the fit. Always investigate: is it a data error, or a genuine extreme case?"
+        ]
+    },
+    {
+        id: 'overfitting',
+        detect: (pts, w, b, r2, mse, maxCooksD, testRMSE) => {
+            if (testRMSE === '—') return false;
+            const trainRMSE = Math.sqrt(mse);
+            const testR = parseFloat(testRMSE);
+            return testR > trainRMSE * 1.8 && testR > 5;
+        },
+        hints: [
+            "🔍 Your test RMSE is much higher than training RMSE. What might this mean?",
+            "💡 The model may not generalize well. Try adding more training data or reducing noise.",
+            "📖 When test error >> train error, the model is overfitting to training data. In practice, use cross-validation and consider regularization."
+        ]
+    },
+    {
+        id: 'poor_fit',
+        detect: (pts, w, b, r2) => {
+            return pts.length >= 5 && r2 < 0.3;
+        },
+        hints: [
+            "🔍 R² is quite low. The linear model explains less than 30% of variance. Is a line the right model?",
+            "💡 Try different transformations or consider if there's truly a relationship in this data.",
+            "📖 Low R² doesn't always mean 'bad model' — some phenomena are inherently noisy. But it's worth checking for non-linearity or missing features."
+        ]
+    }
+];
+
+function runDiagnostics(pts, w, b, r2, mse, maxCooksD, testRMSE) {
+    if (RESEARCH.group !== 'B') return; // Only for Group B
+    if (pts.length < 5) return;
+
+    const panel = document.getElementById('aiHintPanel');
+    const body = document.getElementById('aiHintBody');
+
+    for (const rule of DIAGNOSTIC_RULES) {
+        if (rule.detect(pts, w, b, r2, mse, maxCooksD, testRMSE)) {
+            if (currentDiagnostic !== rule.id) {
+                currentDiagnostic = rule.id;
+                currentHintLevel = 0;
+            }
+            body.innerHTML = rule.hints[currentHintLevel];
+            panel.classList.add('visible');
+            logAction('ai', 'hint_shown', { rule: rule.id, level: currentHintLevel });
+            return;
+        }
+    }
+    // No issues detected
+    panel.classList.remove('visible');
+    currentDiagnostic = null;
+    currentHintLevel = 0;
+}
+
+function requestNextHint() {
+    if (!currentDiagnostic) return;
+    const rule = DIAGNOSTIC_RULES.find(r => r.id === currentDiagnostic);
+    if (!rule) return;
+    currentHintLevel = Math.min(currentHintLevel + 1, rule.hints.length - 1);
+    document.getElementById('aiHintBody').innerHTML = rule.hints[currentHintLevel];
+    logAction('ai', 'request_deeper_hint', { rule: currentDiagnostic, level: currentHintLevel });
+}
+
+function dismissHint() {
+    document.getElementById('aiHintPanel').classList.remove('visible');
+    logAction('ai', 'dismiss_hint', { rule: currentDiagnostic, level: currentHintLevel });
+    currentDiagnostic = null;
+    currentHintLevel = 0;
+}
 
 // ============================================
 // GRADIENT DESCENT SIMULATOR
@@ -2192,6 +2968,112 @@ function resetGD() {
     gdLossChart.update();
 
     updateGDLine();
+}
+
+// ============================================
+// RESEARCH PRE/POST QUIZ — Scored Assessment
+// ============================================
+const RESEARCH_QUESTIONS = [
+    { q: "What does R² = 0.85 mean?", options: ["85% of predictions are correct", "85% of variance in Y is explained by the model", "The model is 85% accurate", "The slope is 0.85"], correct: 1 },
+    { q: "A residual plot shows a clear U-shaped curve. What does this indicate?", options: ["Perfect fit", "Heteroscedasticity", "Non-linear relationship", "Multicollinearity"], correct: 2 },
+    { q: "What happens to the regression line when you add one extreme outlier?", options: ["Nothing — OLS is robust to outliers", "The line shifts toward the outlier", "R² always increases", "The intercept stays the same"], correct: 1 },
+    { q: "Residuals in a 'funnel shape' (spreading out) suggest:", options: ["Normality", "Homoscedasticity", "Heteroscedasticity", "Independence"], correct: 2 },
+    { q: "If train RMSE = 2.1 but test RMSE = 15.3, the model is likely:", options: ["Underfitting", "Overfitting", "Perfectly generalizing", "Has multicollinearity"], correct: 1 },
+    { q: "What does Cook's Distance measure?", options: ["How far a point is from the mean of X", "The influence of a single observation on the regression", "The correlation between residuals", "The normality of errors"], correct: 1 },
+    { q: "Applying log(Y) can help fix which problem?", options: ["Multicollinearity", "Missing data", "Right-skewed residuals or heteroscedasticity", "Low sample size"], correct: 2 },
+    { q: "What does 'correlation ≠ causation' mean in regression context?", options: ["R² is always unreliable", "A significant slope proves X causes Y", "A strong linear fit doesn't prove X causes changes in Y", "Regression can't measure correlation"], correct: 2 },
+    { q: "Increasing training data size generally:", options: ["Increases overfitting", "Reduces variance of estimates", "Increases bias", "Has no effect on the model"], correct: 1 },
+    { q: "Which assumption does the Gauss-Markov theorem NOT require?", options: ["Linearity", "Homoscedasticity", "Normality of errors", "Independence of errors"], correct: 2 },
+];
+
+let researchQuizAnswers = {};
+let researchQuizType = null;
+
+function startResearchQuiz(type) {
+    researchQuizType = type;
+    researchQuizAnswers = {};
+    logAction('quiz', 'start', { type });
+
+    document.getElementById('quizPreBtn').style.display = 'none';
+    document.getElementById('quizPostBtn').style.display = 'none';
+    document.getElementById('researchQuizScore').style.display = 'none';
+
+    const body = document.getElementById('researchQuizBody');
+    body.innerHTML = '';
+
+    // Shuffle questions for each attempt (keep all 10)
+    const shuffled = RESEARCH_QUESTIONS.map((q, i) => ({ ...q, origIdx: i })).sort(() => Math.random() - 0.5);
+
+    shuffled.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'quiz-q';
+        div.innerHTML = `<h4>Q${idx + 1}. ${q.q}</h4>`;
+        q.options.forEach((opt, oi) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.textContent = opt;
+            btn.onclick = () => selectQuizOption(q.origIdx, oi, btn);
+            div.appendChild(btn);
+        });
+        body.appendChild(div);
+    });
+
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'btn btn-primary';
+    submitBtn.style.marginTop = '20px';
+    submitBtn.textContent = '✅ Submit Quiz';
+    submitBtn.onclick = submitResearchQuiz;
+    body.appendChild(submitBtn);
+}
+
+function selectQuizOption(qIdx, optIdx, btn) {
+    // Clear sibling selections
+    const siblings = btn.parentElement.querySelectorAll('.quiz-option');
+    siblings.forEach(s => s.classList.remove('selected'));
+    btn.classList.add('selected');
+    researchQuizAnswers[qIdx] = optIdx;
+    logAction('quiz', 'select_answer', { question: qIdx, selected: optIdx });
+}
+
+function submitResearchQuiz() {
+    let score = 0;
+    for (const [qIdx, ans] of Object.entries(researchQuizAnswers)) {
+        if (RESEARCH_QUESTIONS[qIdx].correct === ans) score++;
+    }
+    const total = RESEARCH_QUESTIONS.length;
+    const answered = Object.keys(researchQuizAnswers).length;
+
+    // Show correct/incorrect
+    const allQDivs = document.querySelectorAll('#researchQuizBody .quiz-q');
+    allQDivs.forEach(div => {
+        const btns = div.querySelectorAll('.quiz-option');
+        btns.forEach(b => b.onclick = null); // disable
+    });
+
+    // Mark answers
+    for (const q of RESEARCH_QUESTIONS) {
+        // Find the quiz-q div that has this question (by matching text is fragile, but works)
+    }
+
+    RESEARCH.quizScores[researchQuizType] = { score, total, answered, timestamp: new Date().toISOString() };
+    logAction('quiz', 'submit', { type: researchQuizType, score, total, answered });
+
+    const scoreDiv = document.getElementById('researchQuizScore');
+    scoreDiv.style.display = 'block';
+    scoreDiv.innerHTML = `
+        <div class="quiz-score-display">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">${researchQuizType === 'pre' ? 'Pre-Test' : 'Post-Test'} Score</div>
+            <div class="score-number">${score} / ${total}</div>
+            <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">${answered} of ${total} answered</div>
+            ${researchQuizType === 'pre' ? '<p style="margin-top:16px; font-size:0.85rem; color:var(--text-muted);">Now explore the playground! Come back for the Post-Test when ready.</p>' : ''}
+            ${RESEARCH.quizScores.pre && RESEARCH.quizScores.post ? `<p style="margin-top:12px; font-weight:700;">Learning Gain: ${RESEARCH.quizScores.post.score - RESEARCH.quizScores.pre.score} points</p>` : ''}
+        </div>
+    `;
+
+    // Show the next quiz button
+    if (researchQuizType === 'pre') {
+        document.getElementById('quizPostBtn').style.display = 'inline-flex';
+    }
 }
 
 // ============================================
